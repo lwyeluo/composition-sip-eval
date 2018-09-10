@@ -3,7 +3,7 @@ EVAL_LIB=/home/sip/eval/passes/build/lib
 FILES=/home/sip/eval/coverage/*.bc
 coverage_dir=/home/sip/eval/coverage
 CSVPATH=/home/sip/eval/combination/
-num_combination=20
+num_combination=1
 func_coverage="0 10 25 50 100"
 for f in $FILES
 do

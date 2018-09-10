@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 set -xeuo pipefail
 
 CLANG=clang-6.0
@@ -23,8 +24,7 @@ config_path=/home/sip/eval/lib-config/
 link_libraries=/home/sip/eval/link-libraries/
 args_path=/home/sip/eval/cmdline-args/
 #SKIP_EXISTING binaries when exactly one argument is passed here regardless of its value
-MAXIMUM_INPUT_INDEPENDENT_SC_COVERAGE=30
-repeat=3
+repeat=1
 #rm -r binaries
 mkdir -p binaries
 
@@ -82,7 +82,7 @@ do
 			echo "Handling combination file $coverage"
 			echo "Protect $bc with function combination file $coverage"
 			#repeat protection for random network of protection
-			for i in 1 2 3
+			for i in $repeat
 			do
 				recover_attempt=0
 				while true;
@@ -171,6 +171,8 @@ do
 						-o "${output_dir}/librtlib.so" ${LIB_FILES[@]} -lssl -lcrypto
 
 
+					mv graph.txt "${output_dir}/graph.txt"
+					mv NewStackAnalysis.c "${output_dir}/NewStackAnalysis.c"
 
 					echo 'Post patching binary after hash calls'
 					${LLC} $output_dir/out.bc -o $output_dir/out.s

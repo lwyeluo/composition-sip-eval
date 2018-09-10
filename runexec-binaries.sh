@@ -1,2 +1,2 @@
-export LD_PRELOAD="/home/sip/self-checksumming/hook/build/libminm.so" 
+export LD_PRELOAD="/home/dennis/Desktop/self-checksumming/hook/build/libminm.so"
 python runexec-binaries.py $1

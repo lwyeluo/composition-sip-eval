@@ -5,11 +5,11 @@
 #		combination 1
 #			SC input dependent
 #				network 1
-#			
+#
 #			Random
 #				network 1
 #				...
-#	
+#
 import os
 import json
 from pprint import pprint
@@ -18,7 +18,7 @@ import re
 import numpy as np
 import sys
 REPEAT_NUMBER=3
-BASE_REPEAT_NUMBER= 10
+BASE_REPEAT_NUMBER=1
 RUNSPROCESSED="runs_processed.json"
 CMDLINE_ARGS="cmdline-args"
 def get_immediate_subdirectories(a_dir):
@@ -76,12 +76,13 @@ def read_args(program):
     return ''
 def measure_overhead(result_directory,program,repeat):
     results = []
+    result_directory = os.path.abspath(result_directory)
     program_path = os.path.join(result_directory,program)
     if not os.path.exists(program_path):
         print "Found a folder without a binary in it"
         #exit(1)
-        return  
-    cmd_args = read_args(program).replace('\n','') 
+        return
+    cmd_args = read_args(program).replace('\n','')
     #cmd_args = cmd_args.replace('<','\<').replace('>','/>')
     print cmd_args
     #TODO run runexec 100 times and calculate avg and std
@@ -100,7 +101,7 @@ def measure_overhead(result_directory,program,repeat):
             cmd_file.close()
             cmd = 'runexec --container -- sh {}'.format(cmd_file.name)
         else:
-            cmd = 'runexec  --container -- {} {}'.format(program_path,cmd_args)
+            cmd = 'LD_PRELOAD="{}" runexec --dir {} --container -- {} {}'.format(result_directory+"/librtlib.so", result_directory,"./"+program,cmd_args)
         #call(["sosylib_measure.sh",program_path])
 	#--container throws a suspicious warning, I'm not sure it the measurements are good
         #cmd = 'runexec {} {} --container'.format(program_path,cmd_args)
@@ -121,9 +122,9 @@ def measure_overhead(result_directory,program,repeat):
             if program == 'bf.x.bc' or program == 'patricia.x.bc':
                 print 'I see bf being added to the results'
             #TODO: bf.x.bc exits with 256 despite the seemingly correct execution
-            results.append(result) 
+            results.append(result)
         #TODO: run any other tool here
-    #write results to the directory 
+    #write results to the directory
     if len(results)!=0:
         runs_path=os.path.join(result_directory,'runs.json')
         with open(runs_path, 'wb') as outfile:
@@ -171,7 +172,7 @@ def process_files(directory):
  #   pprint(program_results)
 
 #    for filename in os.listdir(directory):
-#	if filename.endswith(".bc"): 
+#	if filename.endswith(".bc"):
 #	    print(os.path.join(directory, filename))
 #	continue
  #   else:
@@ -193,8 +194,8 @@ if __name__=="__main__":
 #				For network in combination:
 #					collect result of runexec, coverage,sc input dependent/random
 #					#Goal: protection coverage per instruction or per function (OH, SC, SC+OH)
-#					collect sc.stats, oh.stats, dependency stats 
+#					collect sc.stats, oh.stats, dependency stats
 #					if random:
-                                                #Goal: oh coverage improvements which do not depend on network, nor sc input dependency  
-#						collect dependency.stats 
-#		Avg and Std (collected results) group by coverage, input-dependent/random 
+                                                #Goal: oh coverage improvements which do not depend on network, nor sc input dependency
+#						collect dependency.stats
+#		Avg and Std (collected results) group by coverage, input-dependent/random
