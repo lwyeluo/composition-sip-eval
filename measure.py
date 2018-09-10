@@ -5,11 +5,11 @@
 #		combination 1
 #			SC input dependent
 #				network 1
-#			
+#
 #			Random
 #				network 1
 #				...
-#	
+#
 import os
 import json
 import sys
@@ -30,20 +30,20 @@ def grab_results(result_directory,protection_stats=True):
    # pprint(oh_result)
         sc_result = json.load(open(os.path.join(result_directory,"sc.stats")))
     runs_path = os.path.join(result_directory,"runs.json")
-    runs_result = {} 
+    runs_result = {}
     if os.path.exists(runs_path):
         runs_result = json.load(open(runs_path))
     #else:
      #   print runs_path, ' not found'
     r_path = os.path.join(result_directory,"runs_processed.json")
-    runs_processed = {} 
+    runs_processed = {}
     if os.path.exists(r_path):
         #print "loading", r_path
         runs_processed = json.load(open(os.path.join(result_directory,"runs_processed.json")))
    # pprint(sc_result)
     #TODO: grab any other result file
         if protection_stats and (not sc_result or  not oh_result):
-            print "Err. sc stats or oh stats are empty ",result_directory 
+            print "Err. sc stats or oh stats are empty ",result_directory
             exit(1)
     #else:
      #   print r_path, " not found"
@@ -60,7 +60,7 @@ def process_results(coverage,results,protection_stats,baseline_cpu_mean):
     number_sc_protected_inst = []
     number_sc_oh_protected_inst = []
     number_sc_sroh_protected_inst = []
-    
+
     for combination in results:
        for attempt in combination['attempt_results']:
         #collect runs
@@ -76,15 +76,15 @@ def process_results(coverage,results,protection_stats,baseline_cpu_mean):
             number_sroh_protected_inst.append(attempt['results']['oh_result']['numberOfShortRangeProtectedInstructions'])
             number_sc_oh_protected_inst.append(attempt['results']['oh_result']['numberOfImplicitlyProtectedInstructions'])
             number_sc_sroh_protected_inst.append(attempt['results']['oh_result']['numberOfShortRangeImplicitlyProtectedInstructions'])
-            
+
         coverage_cpu_reads.extend([d['cpu'] for d in attempt['results']['runs'] if 'cpu' in d])
         coverage_memory_reads.extend([d['memory'] for d in attempt['results']['runs'] if 'memory' in d])
     coverage_result = {}
-    
+
     sensitive_inst = np.array(number_sensitive_inst).astype(np.float)
     coverage_result['sensitive_inst_mean'] = np.mean(sensitive_inst)
     coverage_result['sensitive_inst_std'] = np.std(sensitive_inst)
-    
+
     sc_protected_inst= np.array(number_sc_protected_inst).astype(np.float)
     coverage_result['sc_protected_mean'] = np.mean(sc_protected_inst)
     coverage_result['sc_protected_std'] = np.std(sc_protected_inst)
@@ -92,19 +92,19 @@ def process_results(coverage,results,protection_stats,baseline_cpu_mean):
     #    print 'ERR. SC array is ZERO'
     #else:
     #    print 'INFO. SC mean for ', coverage, ' is ',coverage_result['sc_protected_mean']
-    
+
     oh_protected_inst= np.array(number_oh_protected_inst).astype(np.float)
     coverage_result['oh_protected_mean'] = np.mean(oh_protected_inst)
     coverage_result['oh_protected_std'] = np.std(oh_protected_inst)
-    
+
     sc_oh_protected_inst= np.array(number_sc_oh_protected_inst).astype(np.float)
     coverage_result['sc_oh_protected_inst_mean'] = np.mean(sc_oh_protected_inst)
     coverage_result['sc_oh_protected_inst_std'] = np.std(sc_oh_protected_inst)
-    
+
     sroh_protected_inst= np.array(number_sroh_protected_inst).astype(np.float)
     coverage_result['sroh_protected_mean'] = np.mean(sroh_protected_inst)
     coverage_result['sroh_protected_std'] = np.std(sroh_protected_inst)
-    
+
     sc_sroh_protected_inst= np.array(number_sc_sroh_protected_inst).astype(np.float)
     coverage_result['sc_sroh_protected_inst_mean'] = np.mean(sc_sroh_protected_inst)
     coverage_result['sc_sroh_protected_inst_std'] = np.std(sc_sroh_protected_inst)
@@ -113,7 +113,7 @@ def process_results(coverage,results,protection_stats,baseline_cpu_mean):
     #print sorted(coverage_cpu_reads)[:5]
 #    coverage_cpu_reads = sorted(coverage_cpu_reads)[:5]
     #coverage_raw_means  = coverage_cpu_reads
-    #good_reads = [] 
+    #good_reads = []
 #    for raw_mean in coverage_raw_means:
  #       if float(raw_mean) >= baseline_cpu_mean:
   #          good_reads.append(raw_mean)
@@ -123,21 +123,21 @@ def process_results(coverage,results,protection_stats,baseline_cpu_mean):
     coverage_result['mem_std'] = np.std(np.array(coverage_memory_reads).astype(np.float))
     #if mean is less than the baseline skip it, it doesn't make any sense
     if coverage != '0' and coverage_result['cpu_mean'] < baseline_cpu_mean:
-        #coverage_cpu_reads = []      
+        #coverage_cpu_reads = []
         print 'bad measure cpu_mean={}, baseline={} {} '.format(coverage_result['cpu_mean'], baseline_cpu_mean,coverage)
     #print coverage
     #pprint(coverage_result)
     sanity_result = {}
     coverage_cpu_reads = np.array(coverage_cpu_reads).astype(np.float)
-    
+
     if len (coverage_cpu_reads) == 0:
-        coverage_result['cpu_mean'] = 0 
+        coverage_result['cpu_mean'] = 0
         coverage_result['cpu_std'] = 0
         coverage_result['mem_mean'] = 0
         coverage_result['mem_std'] = 0
 
 	return False, coverage_result
-    
+
     sanity_result['min'] = np.min(coverage_cpu_reads)
     sanity_result['max'] = np.max(coverage_cpu_reads)
     sanity_result['median']=np.median(coverage_cpu_reads)
@@ -185,7 +185,7 @@ def process_files(directory, protection_stats):
                     attempt_results.append({"results":results, "attempt":attempt_dir})
                 combination_results.append({"combination":combination_dir,"attempt_results":attempt_results})
                 seen_combs = seen_combs+' '+combination_dir
-            print 'Seen combinations:{}'.format(seen_combs) 
+            print 'Seen combinations:{}'.format(seen_combs)
             good,processed_coverage = process_results(coverage_dir,combination_results,protection_stats, baseline_cpu_mean)
             if coverage_dir=="0":
                 baseline_cpu_mean = processed_coverage['cpu_mean']
@@ -194,7 +194,7 @@ def process_files(directory, protection_stats):
                 has_baseline = True
             else:
                 print '{} {} coverage mean={} coverage std={}'.format(program_dir,coverage_dir,processed_coverage['cpu_mean'], processed_coverage['cpu_std'])
-            if not has_baseline: 
+            if not has_baseline:
                 print 'No baseline found for {}'.format(program_dir)
                 exit(1)
             if not good:
@@ -213,7 +213,7 @@ def process_files(directory, protection_stats):
  #   pprint(program_results)
 
 #    for filename in os.listdir(directory):
-#	if filename.endswith(".bc"): 
+#	if filename.endswith(".bc"):
 #	    print(os.path.join(directory, filename))
 #	continue
  #   else:
@@ -236,8 +236,8 @@ if __name__=="__main__":
 #				For network in combination:
 #					collect result of runexec, coverage,sc input dependent/random
 #					#Goal: protection coverage per instruction or per function (OH, SC, SC+OH)
-#					collect sc.stats, oh.stats, dependency stats 
+#					collect sc.stats, oh.stats, dependency stats
 #					if random:
-                                                #Goal: oh coverage improvements which do not depend on network, nor sc input dependency  
-#						collect dependency.stats 
-#		Avg and Std (collected results) group by coverage, input-dependent/random 
+                                                #Goal: oh coverage improvements which do not depend on network, nor sc input dependency
+#						collect dependency.stats
+#		Avg and Std (collected results) group by coverage, input-dependent/random

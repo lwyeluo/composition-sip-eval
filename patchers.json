@@ -1,0 +1,67 @@
+{
+  "patchers": {
+    "sc": [
+      [
+        "python",
+        "/home/dennis/Desktop/self-checksumming/patcher/dump_pipe.py",
+        "{BINARY}",
+        "{OUTPUT}/sc_guide.txt",
+        "patch_guide",
+	"{OUTPUT}/sc.stats"
+      ]
+    ],
+    "oh": [
+      [
+        "python",
+        "/home/dennis/Desktop/sip-oblivious-hashing/patcher/patchAsserts.py",
+        "-b",
+        "{BINARY}",
+        "-n",
+        "{BINARY}tmp",
+        "-s",
+        "{OUTPUT}/oh.stats",
+        "-p",
+        "/home/dennis/Desktop/sip-oblivious-hashing/assertions/gdb_script_for_do_assert.txt",
+        "-m",
+        "{OUTPUT}/oh_guide.txt",
+        "-g",
+        "{ARGS}",
+        "-d",
+        "True"
+      ],
+      [
+        "mv",
+        "{BINARY}tmp",
+        "{BINARY}"
+      ]
+    ]
+  },
+  "finalizers": [
+    [
+      "rm",
+      "{OUTPUT}/oh_guide.txt"
+    ],
+    [
+      "touch",
+      "{OUTPUT}/oh_guide.txt"
+    ],
+    [
+      "python",
+      "/home/dennis/Desktop/sip-oblivious-hashing/patcher/patchAsserts.py",
+      "-b",
+      "{BINARY}",
+      "-n",
+      "{BINARY}tmp",
+      "-s",
+      "{OUTPUT}/oh.stats",
+      "-p",
+      "/home/dennis/Desktop/sip-oblivious-hashing/assertions/gdb_script_for_do_assert.txt",
+      "-m",
+      "{OUTPUT}/oh_guide.txt",
+      "-f",
+      "True",
+      "-g",
+      "{ARGS}"
+    ]
+  ]
+}
