@@ -130,10 +130,12 @@ do
 					cmd="${cmd} -protect-data-dep-loops"
 					cmd="${cmd} -num-hash 1"
 					cmd="${cmd} -dump-oh-stat=${output_dir}/oh.stats"
+					cmd="${cmd} -exclude-main-unreachables"
+					cmd="${cmd} -main-reach-cached"
 					# CFI flags
 					cmd="${cmd} -cfi-template ${CFI_PATH}/stack_analysis/StackAnalysis.c"
 					# CF flags
-					cmd="${cmd} -cf-strategy=avoidance"
+					cmd="${cmd} -cf-strategy=random"
 					cmd="${cmd} -cf-stats=${output_dir}/composition.stats"
 					cmd="${cmd} -cf-patchinfo=${output_dir}/cf-patchinfo.json"
 					# PASS ORDER
@@ -144,7 +146,7 @@ do
 					cmd="${cmd} -short-range-oh"
 					cmd="${cmd} -constraint-protection"
 					# End of command
-					${cmd} >> "${output_dir}/transform.console"
+					${cmd} |& tee "${output_dir}/transform.console"
 
 
 					echo $output_dir

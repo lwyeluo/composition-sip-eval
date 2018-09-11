@@ -18,7 +18,7 @@ import re
 import numpy as np
 import sys
 REPEAT_NUMBER=3
-BASE_REPEAT_NUMBER=1
+BASE_REPEAT_NUMBER=10
 RUNSPROCESSED="runs_processed.json"
 CMDLINE_ARGS="cmdline-args"
 def get_immediate_subdirectories(a_dir):
@@ -101,12 +101,16 @@ def measure_overhead(result_directory,program,repeat):
             cmd_file.close()
             cmd = 'runexec --container -- sh {}'.format(cmd_file.name)
         else:
-            cmd = 'LD_PRELOAD="{}" runexec --dir {} --container -- {} {}'.format(result_directory+"/librtlib.so", result_directory,"./"+program,cmd_args)
+            cmd = 'runexec --container -- {} {}'.format(program_path,cmd_args)
         #call(["sosylib_measure.sh",program_path])
 	#--container throws a suspicious warning, I'm not sure it the measurements are good
         #cmd = 'runexec {} {} --container'.format(program_path,cmd_args)
         print cmd
-        process = Popen(cmd,shell=True,stdout=PIPE)
+	from shutil import copyfile
+	if os.path.isfile(result_directory+"/graph.txt"):
+	    copyfile(result_directory+"/graph.txt", "graph.txt")
+
+        process = Popen(cmd,shell=True,stdout=PIPE,env=dict(os.environ, LD_PRELOAD=result_directory+"/librtlib.so"))
         (output,err)=process.communicate()
         exit_code=process.wait()
 	print 'exitcode=',exit_code

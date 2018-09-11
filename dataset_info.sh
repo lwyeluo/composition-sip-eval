@@ -1,17 +1,23 @@
-INPUT_DEP_PATH=/usr/local/lib/
-#UTILS_LIB=/home/anahitik/SIP/self-checksumming/build/lib/libUtils.so
-#DG_PATH=/usr/local/lib/
-#OH_PATH=/home/anahitik/SIP/sip-oblivious-hashing
-#OH_LIB=$OH_PATH/build/lib
-#FILES=/home/anahitik/SIP/sip-eval/local_dataset/*.bc
-##FILES=/home/anahitik/SIP/sip-eval/dataset/*.bc
-#DATAPATH=/home/anahitik/SIP/sip-eval/dataset_info/
-#configs=/home/anahitik/SIP/sip-eval/lib-config
+#!/usr/bin/env bash
+set -xeuo pipefail
 
-UTILS_LIB=/home/sip/self-checksumming/build/lib/libUtils.so
-DG_PATH=/usr/local/lib/
-OH_PATH=/home/sip/sip-oblivious-hashing
-OH_LIB=$OH_PATH/build/lib
+CLANG=clang-6.0
+OPT=opt
+LLC=llc
+LLVM_LINK=llvm-link
+INPUT_DEP_PATH=/usr/local/lib/
+
+SC_PATH=/home/dennis/Desktop/self-checksumming
+CF_PATH=/home/dennis/Desktop/composition-framework
+CFI_PATH=/home/dennis/Desktop/sip-control-flow-integrity
+CMM_PATH=/home/dennis/Desktop/code-mobility-mock
+OH_PATH=/home/dennis/Desktop/sip-oblivious-hashing
+
+USR_LIB_DIR=/usr/local/lib
+INPUT_DEP_PATH=${USR_LIB_DIR}
+DG_PATH=${USR_LIB_DIR}
+OH_LIB=$OH_PATH/cmake-build-debug
+
 FILES=/home/sip/eval/dataset/*.bc
 DATAPATH=/home/sip/eval/dataset_info/
 configs=/home/sip/eval/lib-config
@@ -25,17 +31,61 @@ do
 	libconfig=$configs/$filename
 	output_dir=$DATAPATH/$filename
 	mkdir -p $output_dir 
-    cd $output_dir
-	#opt -load $INPUT_DEP_PATH/libInputDependency.so $bitcode -mod-size
-    #print "opt -load $INPUT_DEP_PATH/libInputDependency.so $bitcode -input-dep -lib-config=$libconfig -dependency-stats"
-    #opt -load $INPUT_DEP_PATH/libInputDependency.so $bitcode -strip-debug -unreachableblockelim -globaldce -input-dep -dependency-stats -lib-config=$libconfig  -o $output_dir/out.bc >> $output_dir/transform.console
-    opt -load $DG_PATH/libLLVMdg.so -load $INPUT_DEP_PATH/libInputDependency.so -load $UTILS_LIB -load $OH_LIB/liboblivious-hashing.so -load $INPUT_DEP_PATH/libTransforms.so $bitcode -strip-debug -unreachableblockelim -globaldce -dependency-stats -oh-insert -short-range-oh -protect-data-dep-loops -num-hash 1 -dump-oh-stat=$output_dir/"oh.stats" -o $output_dir/out.bc >> $output_dir/transform.console 
-    cd -
+    	cd $output_dir
+
+	cmd="${OPT}"
+	# Input & Output
+	cmd="${cmd} ${bitcode}"
+	cmd="${cmd} -o ${output_dir}/out.bc"
+	# All needed libs
+	cmd="${cmd} -load ${INPUT_DEP_PATH}/libInputDependency.so"
+	cmd="${cmd} -load ${DG_PATH}/libLLVMdg.so"
+	cmd="${cmd} -load ${USR_LIB_DIR}/libUtils.so"
+	cmd="${cmd} -load ${USR_LIB_DIR}/libCompositionFramework.so "
+	cmd="${cmd} -load ${USR_LIB_DIR}/libSCPass.so"
+	cmd="${cmd} -load ${OH_LIB}/liboblivious-hashing.so"
+	cmd="${cmd} -load ${INPUT_DEP_PATH}/libTransforms.so"
+	cmd="${cmd} -load ${CFI_PATH}/cmake-build-debug/libControlFlowIntegrity.so"
+	cmd="${cmd} -load ${CMM_PATH}/cmake-build-debug/libCodeMobilityMock.so"
+	# General flags
+	cmd="${cmd} -strip-debug"
+	cmd="${cmd} -unreachableblockelim"
+	cmd="${cmd} -globaldce"
+	cmd="${cmd} -use-cache"
+	cmd="${cmd} -goto-unsafe"
+	# Input-Dep flags
+	cmd="${cmd} -dependency-stats"
+	# SC flags
+	cmd="${cmd} -extracted-only"
+	cmd="${cmd} -use-other-functions"
+	cmd="${cmd} -connectivity=1"
+	cmd="${cmd} -dump-checkers-network=${output_dir}/network_file"
+	cmd="${cmd} -dump-sc-stat=${output_dir}/sc.stats"
+	# OH flags
+	cmd="${cmd} -protect-data-dep-loops"
+	cmd="${cmd} -num-hash 1"
+	cmd="${cmd} -dump-oh-stat=${output_dir}/oh.stats"
+	# CFI flags
+	cmd="${cmd} -cfi-template ${CFI_PATH}/stack_analysis/StackAnalysis.c"
+	# CF flags
+	cmd="${cmd} -cf-strategy=avoidance"
+	cmd="${cmd} -cf-stats=${output_dir}/composition.stats"
+	cmd="${cmd} -cf-patchinfo=${output_dir}/cf-patchinfo.json"
+	# PASS ORDER
+	cmd="${cmd} -sc"
+	cmd="${cmd} -control-flow-integrity"
+	cmd="${cmd} -code-mobility"
+	cmd="${cmd} -oh-insert"
+	cmd="${cmd} -short-range-oh"
+	cmd="${cmd} -constraint-protection"
+	# End of command
+	${cmd} |& tee "${output_dir}/transform.console"
+    	
+	cd -
 	if [ $? -eq 0 ]; then
 		echo 'OK module size'
 	else
 		echo 'FAIL module size'
-		echo "opt -load $INPUT_DEP_PATH/libInputDependency.so $bitcode -input-dep -lib-config=$libconfig -dependency-stats"
 		exit    
 	fi  
 done

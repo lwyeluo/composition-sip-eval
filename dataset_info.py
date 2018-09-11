@@ -4,7 +4,6 @@ from pprint import pprint
 import numpy as np
 
 INFO_DIR="/home/sip/eval/dataset_info/"
-#INFO_DIR="/home/anahitik/SIP/sip-eval/dataset_info/"
 TEX_OUT_FOLDER='tex'
 STATS="stats"
 OH_STATS="oh.stats"
@@ -353,8 +352,10 @@ def dump_latex_table():
 def parse_stats(bitcode_name, dir_name):
     file_name = os.path.join(dir_name, STATS)
     stats = json.load(open(file_name))
+
     #module_name_key = dir_name.replace("dataset_info", "local_dataset")
-    module_name_key = dir_name.replace("dataset_info", "coverage_dataset")
+    module_name_key = dir_name.replace("dataset_info", "dataset")
+
     input_dep_cov = stats[INPUT_DEP_STATS_KEY][module_name_key][INPUT_DEP_COVERAGE_KEY][INSTR_COVERAGE_KEY]
     input_dep_coverage[bitcode_name] = input_dep_cov
     input_indep_instr[bitcode_name] = stats[INPUT_DEP_STATS_KEY][module_name_key][INPUT_INDEP_COVERAGE_KEY][INPUT_INDEP_INSTR_KEY]
@@ -372,6 +373,7 @@ def parse_stats(bitcode_name, dir_name):
 def parse_oh_stats(bitcode_name, dir_name):
     file_name = os.path.join(dir_name, OH_STATS)
     stats = json.load(open(file_name))
+
     oh_protected_instr[bitcode_name] = stats[OH_PROTECTED_INSTR_KEY]
     short_range_oh_protected_instr[bitcode_name] = stats[SHORT_RANGE_OH_PROTECTED_INSTR_KEY]
     short_range_oh_protected_data_dep_instr[bitcode_name] = stats[SHORT_RANGE_OH_PROTECTED_DATA_DEP_INSTR_KEY]
@@ -421,11 +423,11 @@ def parse_bitcode_data():
     
 def main():
     parse_bitcode_data()
-    #print(instructions)
-    #print(input_dep_coverage)
-    #print(input_indep_coverage)
-    #print(data_indep_coverage)
-    #dump_latex_table()
+    print(instructions)
+    print(input_dep_coverage)
+    print(input_indep_coverage)
+    print(data_indep_coverage)
+    dump_latex_table()
     dump_coverage_table()
     dump_latex_table_for_paper()
     dump_latex_table_for_paper(False)
