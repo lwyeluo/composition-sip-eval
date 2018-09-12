@@ -32,3 +32,8 @@
 *.app
 
 *.swp
+
+binaries/
+combination/
+coverage/
+dataset_info/
