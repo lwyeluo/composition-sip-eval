@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 set -xeou pipefail
 #run clone and extraction passed to identify function names for the combination generator
 sh coverage-improver.sh $@

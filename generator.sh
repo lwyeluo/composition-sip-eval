@@ -111,8 +111,8 @@ do
 					cmd="${cmd} -load ${USR_LIB_DIR}/libSCPass.so"
 					cmd="${cmd} -load ${OH_LIB}/liboblivious-hashing.so"
 					cmd="${cmd} -load ${INPUT_DEP_PATH}/libTransforms.so"
-					cmd="${cmd} -load ${CFI_PATH}/cmake-build-debug/libControlFlowIntegrity.so"
-					cmd="${cmd} -load ${CMM_PATH}/cmake-build-debug/libCodeMobilityMock.so"
+					cmd="${cmd} -load ${CFI_PATH}/cmake-build-release/libControlFlowIntegrity.so"
+					cmd="${cmd} -load ${CMM_PATH}/cmake-build-release/libCodeMobilityMock.so"
 					# General flags
 					cmd="${cmd} -strip-debug"
 					cmd="${cmd} -unreachableblockelim"
@@ -134,8 +134,9 @@ do
 					cmd="${cmd} -main-reach-cached"
 					# CFI flags
 					cmd="${cmd} -cfi-template ${CFI_PATH}/stack_analysis/StackAnalysis.c"
+					cmd="${cmd} -cfi-outputdir ${output_dir}"
 					# CF flags
-					cmd="${cmd} -cf-strategy=random"
+					cmd="${cmd} -cf-strategy=avoidance"
 					cmd="${cmd} -cf-stats=${output_dir}/composition.stats"
 					cmd="${cmd} -cf-patchinfo=${output_dir}/cf-patchinfo.json"
 					# PASS ORDER
@@ -160,10 +161,10 @@ do
 
 					# compiling external libraries to bitcodes
 					LIB_FILES=()
-					gcc -no-pie -fPIC $OH_PATH/assertions/response.c -c -o $output_dir/oh_rtlib.o
+					gcc -no-pie -fPIC $OH_PATH/assertions/response.c -c -o "${output_dir}/oh_rtlib.o"
 					LIB_FILES+=( "${output_dir}/oh_rtlib.o" )
 
-					gcc -no-pie -fPIC -g -rdynamic -c "./NewStackAnalysis.c" -o "${output_dir}/cfi_rtlib.o"
+					gcc -no-pie -fPIC -g -rdynamic -c "${output_dir}/NewStackAnalysis.c" -o "${output_dir}/cfi_rtlib.o"
 					LIB_FILES+=( "${output_dir}/cfi_rtlib.o" )
 
 					gcc -no-pie -fPIC -g -rdynamic -c "${SC_PATH}/rtlib.c" -o "${output_dir}/sc_rtlib.o"
@@ -172,9 +173,6 @@ do
 					g++ -no-pie -fPIC -std=c++11 -g -rdynamic -shared -Wl,-soname,librtlib.so \
 						-o "${output_dir}/librtlib.so" ${LIB_FILES[@]} -lssl -lcrypto
 
-
-					mv graph.txt "${output_dir}/graph.txt"
-					mv NewStackAnalysis.c "${output_dir}/NewStackAnalysis.c"
 
 					echo 'Post patching binary after hash calls'
 					${LLC} $output_dir/out.bc -o $output_dir/out.s
@@ -195,6 +193,7 @@ do
 						exit
 					fi
 
+					cp "${output_dir}/${filename}" "${output_dir}/${filename}_backup"
 					#remove temp files
 					rm $output_dir/out.s ||:
 
@@ -204,7 +203,9 @@ do
 
 					if [ $? -eq 0 ]; then
 						echo 'OK GDB Patch'
-						mv $output_dir/$filename"tmp" $output_dir/$filename
+						if [ -f $output_dir/$filename"tmp" ]; then
+							mv $output_dir/$filename"tmp" $output_dir/$filename
+						fi
 						chmod +x $output_dir/$filename
 						recover_attempt=0
 						break # BREAK the while loop

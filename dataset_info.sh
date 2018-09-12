@@ -30,8 +30,8 @@ do
 	filename=${f##*/}
 	libconfig=$configs/$filename
 	output_dir=$DATAPATH/$filename
-	mkdir -p $output_dir 
-    	cd $output_dir
+	mkdir -p $output_dir
+    cd $output_dir
 
 	cmd="${OPT}"
 	# Input & Output
@@ -68,7 +68,7 @@ do
 	# CFI flags
 	cmd="${cmd} -cfi-template ${CFI_PATH}/stack_analysis/StackAnalysis.c"
 	# CF flags
-	cmd="${cmd} -cf-strategy=avoidance"
+	cmd="${cmd} -cf-strategy=random"
 	cmd="${cmd} -cf-stats=${output_dir}/composition.stats"
 	cmd="${cmd} -cf-patchinfo=${output_dir}/cf-patchinfo.json"
 	# PASS ORDER
@@ -80,13 +80,13 @@ do
 	cmd="${cmd} -constraint-protection"
 	# End of command
 	${cmd} |& tee "${output_dir}/transform.console"
-    	
+
 	cd -
 	if [ $? -eq 0 ]; then
 		echo 'OK module size'
 	else
 		echo 'FAIL module size'
-		exit    
-	fi  
+		exit
+	fi
 done
 

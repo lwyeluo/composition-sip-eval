@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 UTILS_LIB=/home/sip/self-checksumming/build/lib/libUtils.so
 #INPUT_DEP_PATH=/usr/local/lib/
 INPUT_DEP_PATH=/home/sip/input-dependency-analyzer/build/lib
