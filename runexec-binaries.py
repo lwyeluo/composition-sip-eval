@@ -31,12 +31,6 @@ def repeats_for_directory(coverage_dir):
     return REPEAT_NUMBER
 
 
-def prepare_result_folder(directory):
-    directory = os.path.join(directory, "runs")
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-
-
 def read_args(program):
     filename = os.path.join(CMDLINE_ARGS, program + '.runexec')
     if not os.path.isfile(filename):
