@@ -19,6 +19,7 @@ EXIT_CODES = {
     'bf.x.bc': 256,
 }
 FAULTY_BINARY = "faulty_binary.txt"
+LD_PRELOAD = ['/home/dennis/Desktop/self-checksumming/hook/build/libminm.so']
 
 
 def get_immediate_subdirectories(d):
@@ -90,7 +91,9 @@ def measure_overhead(result_directory, program, repeat):
 
         print(str(i), " trying to run:", program_path)
         env = os.environ
-        env["LD_PRELOAD"] = os.path.join(result_directory, "librtlib.so")
+        preload = LD_PRELOAD
+        preload.append(os.path.join(result_directory, "librtlib.so"))
+        env["LD_PRELOAD"] = ":".join(preload)
 
         output_log = os.path.join(result_directory, 'output_' + str(i) + '.log')
         args = [program_path]
