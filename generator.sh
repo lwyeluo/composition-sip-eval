@@ -223,7 +223,7 @@ do
 
 					#Patch using GDB
 					echo 'Starting GDB patcher, this will wait for input when nothing is provided'
-					python "${CF_PATH}/hook/patcher.py" "${output_dir}/${filename}" -m "${output_dir}/cf-patchinfo.json" -p "patchers.json" -o "${output_dir}" --args-path "${cmd_args}" |& tee "${output_dir}/patcher.console"
+					python "${CF_PATH}/hook/patcher.py" "${output_dir}/${filename}" -m "${output_dir}/cf-patchinfo.json" -p "patchers.json" -o "${output_dir}" --args-path "${cmd_args}" &> "${output_dir}/patcher.console"
 
 					if [ $? -eq 0 ]; then
 						echo 'OK GDB Patch'
