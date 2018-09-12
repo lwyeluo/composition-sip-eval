@@ -37,3 +37,8 @@ binaries/
 combination/
 coverage/
 dataset_info/
+
+graph.txt
+faulty_binary.txt
+passes/build/
+.idea/
