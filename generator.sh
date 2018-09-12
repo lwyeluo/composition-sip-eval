@@ -50,11 +50,31 @@ do
 		output_dir=$binary_path/$filename/$coverage_name
 		mkdir -p $output_dir
 		#Generate unprotected binary for the baseline
+
 		if [ $coverage_name -eq 0 ]; then
+			#avoid regenerating if desired
+
+			if [ $# -eq 1 ]; then
+			    CONT=0
+                {
+                    flock -s 200
+
+                    if [ -d "$output_dir/0/1" ]; then
+                        echo "Skipping $output_dir"
+                        CONT=1
+                    else
+                        mkdir -p $output_dir/0/1
+                    fi
+                } 200>/var/lock/cfgenerator
+                if [ "$CONT" -eq "1" ]; then
+                    continue
+                fi
+            else
+                mkdir -p $output_dir/0/1
+			fi
 			echo "Handling baseline"
 			${LLC} $bitcode -o $output_dir/out.s
 			#make a dummy combination=0 and a dummy attempt=1 just for the sake of complying with the directory structure
-			mkdir -p $output_dir/0/1
 			g++ -no-pie -fPIC -std=c++0x -g -rdynamic $output_dir/out.s -o $output_dir/0/1/$filename $libraries
 			rm $output_dir/out.s
 			continue
@@ -65,13 +85,23 @@ do
 			output_dir=$binary_path/$filename/$coverage_name/$combination_file
 			#avoid regenerating if desired
 			if [ $# -eq 1 ]; then
-				if [ -d "$output_dir" ]; then
-					echo "Skipping $output_dir"
-					continue
-				fi
-			fi
+                CONT=0
+			    {
+                    flock -s 200
 
-			mkdir -p $output_dir
+                    if [ -d "$output_dir" ]; then
+                        echo "Skipping $output_dir"
+                        CONT=1
+                    else
+                        mkdir -p $output_dir
+                    fi
+                } 200>/var/lock/cfgenerator
+                if [ "$CONT" -eq "1" ]; then
+                    continue
+                fi
+			else
+               mkdir -p $output_dir
+            fi
 
 			echo "Handling combination file $coverage"
 			echo "Protect $bc with function combination file $coverage"

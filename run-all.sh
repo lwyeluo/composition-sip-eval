@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -xeou pipefail
 #run clone and extraction passed to identify function names for the combination generator
-sh coverage-improver.sh $@
+./coverage-improver.sh $@
 #extract filter fils (i.e. combinations) from the list of available function names
-sh combinator.sh $@
+./combinator.sh $@
 #generat prottected binaries
-sh generator.sh $@
+./generator.sh $@
 if [ $? -eq 0 ]; then
 	echo 'OK generator'
 else
@@ -13,7 +13,7 @@ else
 	exit
 fi
 #run each protected program and measure the overhead imposed by the protection
-runexec-binaries.py
+./runexec-binaries.py
 if [ $? -eq 0 ]; then
 	echo 'OK runexec'
 else
