@@ -7,7 +7,7 @@
         "{BINARY}",
         "{OUTPUT}/sc_guide.txt",
         "patch_guide",
-	"{OUTPUT}/sc.stats"
+        "{OUTPUT}/sc.stats"
       ]
     ],
     "oh": [
@@ -25,7 +25,7 @@
         "-m",
         "{OUTPUT}/oh_guide.txt",
         "-g",
-        "{ARGS}",
+        "\"{ARGS}\"",
         "-d",
         "True"
       ],
@@ -61,7 +61,7 @@
       "-f",
       "True",
       "-g",
-      "{ARGS}"
+      "\"{ARGS}\""
     ]
   ]
 }
