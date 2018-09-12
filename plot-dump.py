@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+from __future__ import print_function
 import numpy as np
 import matplotlib
 # matplotlib.use("gtk")
@@ -15,7 +17,7 @@ def read(file_path):
     overhead = {}
     program_count = 0
     program_count = len(data)
-    print 'len(data)=', program_count
+    print('len(data)=', program_count)
     programs = []
     data = sorted(data, key=lambda x: x['program'])
     protection_coverage_table = []
@@ -42,9 +44,9 @@ def read(file_path):
             sensitive_inst_std = coverage_result['runtime_overhead']['sensitive_inst_std']
             sc_protected_mean = coverage_result['runtime_overhead']['sc_protected_mean']
             if sc_protected_mean == 0:
-                print 'ERR. SC MEAN is ZERO'
+                print('ERR. SC MEAN is ZERO')
             else:
-                print 'INFO. SC Mean is ', sc_protected_mean
+                print('INFO. SC Mean is ', sc_protected_mean)
             sc_protected_std = coverage_result['runtime_overhead']['sc_protected_std']
 
             oh_protected_mean = coverage_result['runtime_overhead']['oh_protected_mean']
@@ -81,12 +83,19 @@ def prepare_xtick_labels(coverage_labels, programs, E, N, M):
     # Append program name to labels
     i = 0
     for p in programs:
-        # 2 is index of 25 in the labels, -1 becuase index starts from 0
-        coverage_labels[i + 2] = p.replace('.bc', '').replace('.x', '').replace('_testapp', '').replace('_game',
-                                                                                                        '').replace(
-            '_large', '-l').replace('_small', '-s').replace('raw', '').replace('search', 'srch').replace('sort',
-                                                                                                         'srt').replace(
-            'basicmath', 'bm').replace('dijkstra', 'dkstra')
+        # 2 is index of 25 in the labels, -1 because index starts from 0
+        coverage_labels[i + 2] = p. \
+            replace('.bc', ''). \
+            replace('.x', ''). \
+            replace('_testapp', ''). \
+            replace('_game', ''). \
+            replace('_large', '-l'). \
+            replace('_small', '-s'). \
+            replace('raw', ''). \
+            replace('search', 'srch'). \
+            replace('sort', 'srt'). \
+            replace('basicmath', 'bm'). \
+            replace('dijkstra', 'dkstra')
         # print 'i:{},M:{}'.format(i, M)
         i += M + E
     return coverage_labels
@@ -152,7 +161,7 @@ def main():
 
     OVERHEAD_IN_PERCENTAGE = results.percentage
     programs, overheads, protection_coverage_table = read(results.measuresfile)
-    print 'OVERHEADS'
+    print('OVERHEADS')
     # pprint(overheads)
     # exit(1)
     # protection_coverage_table_content = dump_protection_coverage_table(protection_coverage_table)
@@ -164,7 +173,7 @@ def main():
     # with open(file_path,'wb') as texfile:
     #    texfile.write(protection_coverage_table_content)
     # print 'Dumped protection coverage table in latex format: tex/protection_coverage_table.tex'
-    print overheads['0']['programs']
+    print(overheads['0']['programs'])
     program_count = len(overheads['0']['programs'])
     # exit(1)
     # cpu_means=[]
@@ -178,10 +187,10 @@ def main():
     fig, ax = plt.subplots()
     width = results.width
     # ind_width=0.00
-    print 'program count:', N, ' coverage count:', M
+    print('program count:', N, ' coverage count:', M)
     ind = np.arange(0, program_count * (M + E) * width,
                     width)  # Number of bars we need is in total N (programs) times M (coverages)
-    print 'total columns:', len(ind)
+    print('total columns:', len(ind))
     # exit(1)
     rects = []
     coverage_color = {}
@@ -221,9 +230,9 @@ def main():
         coverage_labels.append('')
         ax_color = coverage_color[coverage]
         ax_hatch = coverage_hatch[coverage]
-        print 'coverage {} mean:{} std: {} median:{}'.format(coverage, np.mean(overheads[coverage][means_dic_name]),
+        print('coverage {} mean:{} std: {} median:{}'.format(coverage, np.mean(overheads[coverage][means_dic_name]),
                                                              np.std(overheads[coverage][means_dic_name]),
-                                                             np.median(overheads[coverage][means_dic_name]))
+                                                             np.median(overheads[coverage][means_dic_name])))
         pprint(zip(programs, overheads[coverage][means_dic_name]))
 
         # ax_ind = ind+ind_width
@@ -280,7 +289,7 @@ def main():
     fig.set_size_inches(8.7, 4.0)
     fig.savefig(fig_name, bbox_inches='tight')
     plt.show()
-    print 'showing'
+    print('showing')
 
 
 if __name__ == "__main__":

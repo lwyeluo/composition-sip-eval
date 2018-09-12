@@ -1,18 +1,10 @@
+#!/usr/bin/env python
 # Run benchmarks pseudo code
 
-# program.bc
-#	coverage 10
-#		combination 1
-#			SC input dependent
-#				network 1
-#
-#			Random
-#				network 1
-#				...
-#
+from __future__ import print_function
+import argparse
 import os
 import json
-import sys
 from pprint import pprint
 import numpy as np
 
@@ -20,13 +12,13 @@ oh_results = {}
 sc_results = {}
 
 
-def get_immediate_subdirectories(a_dir):
-    return [name for name in os.listdir(a_dir)
-            if os.path.isdir(os.path.join(a_dir, name))]
+def get_immediate_subdirectories(d):
+    return filter(os.path.isdir, [os.path.join(d, f) for f in os.listdir(d)])
 
 
 def grab_results(result_directory, protection_stats=True):
     # Baseline do not have protection stats
+    print(result_directory)
     oh_result = {}
     sc_result = {}
     if protection_stats:
@@ -47,7 +39,7 @@ def grab_results(result_directory, protection_stats=True):
         # pprint(sc_result)
         # TODO: grab any other result file
         if protection_stats and (not sc_result or not oh_result):
-            print "Err. sc stats or oh stats are empty ", result_directory
+            print("Err. sc stats or oh stats are empty ", result_directory)
             exit(1)
     # else:
     #   print r_path, " not found"
@@ -75,7 +67,7 @@ def process_results(coverage, results, protection_stats, baseline_cpu_mean):
                 if 'numberOfSensitiveInstructions' in attempt['results']['sc_result']:
                     number_sensitive_inst.append(attempt['results']['sc_result']['numberOfSensitiveInstructions'])
                 if 'numberOfProtectedInstructions' not in attempt['results']['sc_result']:
-                    print coverage, attempt['results']
+                    print(coverage, attempt['results'])
                     exit(1)
                 number_sc_protected_inst.append(attempt['results']['sc_result']['numberOfProtectedInstructions'])
                 number_oh_protected_inst.append(attempt['results']['oh_result']['numberOfProtectedInstructions'])
@@ -86,7 +78,7 @@ def process_results(coverage, results, protection_stats, baseline_cpu_mean):
                 number_sc_sroh_protected_inst.append(
                     attempt['results']['oh_result']['numberOfShortRangeImplicitlyProtectedInstructions'])
 
-            coverage_cpu_reads.extend([d['cpu'] for d in attempt['results']['runs'] if 'cpu' in d])
+            coverage_cpu_reads.extend([d['cputime'] for d in attempt['results']['runs'] if 'cputime' in d])
             coverage_memory_reads.extend([d['memory'] for d in attempt['results']['runs'] if 'memory' in d])
     coverage_result = {}
 
@@ -133,8 +125,11 @@ def process_results(coverage, results, protection_stats, baseline_cpu_mean):
     # if mean is less than the baseline skip it, it doesn't make any sense
     if coverage != '0' and coverage_result['cpu_mean'] < baseline_cpu_mean:
         # coverage_cpu_reads = []
-        print 'bad measure cpu_mean={}, baseline={} {} '.format(coverage_result['cpu_mean'], baseline_cpu_mean,
-                                                                coverage)
+        print('bad measure cpu_mean={}, baseline={} {} '.format(
+            coverage_result['cpu_mean'],
+            baseline_cpu_mean,
+            coverage
+        ))
     # print coverage
     # pprint(coverage_result)
     sanity_result = {}
@@ -152,7 +147,6 @@ def process_results(coverage, results, protection_stats, baseline_cpu_mean):
     sanity_result['max'] = np.max(coverage_cpu_reads)
     sanity_result['median'] = np.median(coverage_cpu_reads)
     sanity_result['percentile_90'] = np.percentile(coverage_cpu_reads, 90.0)
-
     sanity_result['percentile_50'] = np.percentile(coverage_cpu_reads, 50.0)
     sanity_result['percentile_80'] = np.percentile(coverage_cpu_reads, 80.0)
     sanity_result['percentile_40'] = np.percentile(coverage_cpu_reads, 40.0)
@@ -160,7 +154,7 @@ def process_results(coverage, results, protection_stats, baseline_cpu_mean):
     # pprint(sanity_result)
     # print "Coverage results:", coverage
     # pprint(coverage_result)
-    print 'Coverage means:'
+    print('Coverage means:')
     pprint(coverage_cpu_reads)
     return True, coverage_result
 
@@ -169,94 +163,81 @@ def process_files(directory, protection_stats):
     program_results = []
     baseline = 0
     for program_dir in get_immediate_subdirectories(directory):
-        # if program_dir not in ['susan.bc','snake.bc','sha.bc','say.x.bc','rijndael.x.bc','rawcaudio.x.bc','rawdaudio.x.bc','qsort_small.x.bc','qsort_large.x.bc','patricia.x.bc','fft.x.bc','crc.x.bc','dijkstra_large.x.bc','dijkstra_small.x.bc','cjpeg.x.bc','bitcnts.x.bc','bf.x.bc','basicmath_large.x.bc','basicmath_small.x.bc','tetris.bc', 'search_large.x.bc','search_small.x.bc']:
-        # if program_dir not in ['dijkstra_large.x.bc','dijkstra_small.x.bc']:
-        #   print 'skipping {}'.format(program_dir)
-        #  continue
-        print 'handling ', program_dir
+        program = os.path.basename(program_dir)
+        print('handling ', program_dir)
         coverage_results = []
         has_baseline = False
         baseline_cpu_mean = 0
-        for coverage_dir in sorted(get_immediate_subdirectories(os.path.join(directory, program_dir))):
+        for coverage_dir in sorted(get_immediate_subdirectories(program_dir)):
+            coverage = os.path.basename(coverage_dir)
             combination_results = []
             seen_combs = ''
-            print 'looking here:{}'.format(os.path.join(directory, program_dir, coverage_dir))
-            print get_immediate_subdirectories(os.path.join(directory, program_dir, coverage_dir))
-            for combination_dir in get_immediate_subdirectories(os.path.join(directory, program_dir, coverage_dir)):
+            print('looking here:{}'.format(coverage_dir))
+            for combination_dir in get_immediate_subdirectories(coverage_dir):
                 attempt_results = []
-                attempt_path = os.path.join(directory, program_dir, coverage_dir, combination_dir);
-                for attempt_dir in get_immediate_subdirectories(attempt_path):
-                    result_path = os.path.join(directory, program_dir, coverage_dir, combination_dir, attempt_dir);
+                combination = os.path.basename(combination_dir)
+
+                for attempt_dir in get_immediate_subdirectories(combination_dir):
+                    print(attempt_dir)
+                    result_path = attempt_dir
+                    attempt = os.path.basename(attempt_dir)
+
                     # if baseline no protection stats
-                    results = grab_results(result_path, coverage_dir != "0" and protection_stats)
+                    results = grab_results(result_path, coverage != "0" and protection_stats)
                     if len(results['runs_processed']) <= 1:
-                        print "No runtime measurement for {}".format(result_path)
+                        print("No runtime measurement for {}".format(result_path))
                     # else:
                     #   print "Found {} run results".format(len(results['runs_processed']))
                     # print results['runs_processed']
-                    attempt_results.append({"results": results, "attempt": attempt_dir})
-                combination_results.append({"combination": combination_dir, "attempt_results": attempt_results})
-                seen_combs = seen_combs + ' ' + combination_dir
-            print 'Seen combinations:{}'.format(seen_combs)
-            good, processed_coverage = process_results(coverage_dir, combination_results, protection_stats,
+                    attempt_results.append({"results": results, "attempt": attempt})
+                combination_results.append({"combination": combination, "attempt_results": attempt_results})
+                print(coverage)
+                seen_combs = seen_combs + ' ' + combination
+            print('Seen combinations:{}'.format(seen_combs))
+            good, processed_coverage = process_results(coverage, combination_results, protection_stats,
                                                        baseline_cpu_mean)
-            if coverage_dir == "0":
+
+            if coverage == "0":
                 baseline_cpu_mean = processed_coverage['cpu_mean']
-                print 'Baseline computed for {} ={}'.format(program_dir, baseline_cpu_mean)
+                print('Baseline computed for {} ={}'.format(program, baseline_cpu_mean))
                 baseline += 1
                 has_baseline = True
             else:
-                print '{} {} coverage mean={} coverage std={}'.format(program_dir, coverage_dir,
+                print('{} {} coverage mean={} coverage std={}'.format(program, coverage,
                                                                       processed_coverage['cpu_mean'],
-                                                                      processed_coverage['cpu_std'])
+                                                                      processed_coverage['cpu_std']))
             if not has_baseline:
-                print 'No baseline found for {}'.format(program_dir)
+                print('No baseline found for {}'.format(program))
                 exit(1)
             if not good:
-                print 'ERR. no results for coverage {} of program {}'.format(coverage_dir, program_dir)
-                print 'Adding zero result for the sake of the perfromance plots'
-            coverage_results.append({"coverage": coverage_dir, "runtime_overhead": processed_coverage,
+                print('ERR. no results for coverage {} of program {}'.format(coverage, program))
+                print('Adding zero result for the sake of the perfromance plots')
+            coverage_results.append({"coverage": coverage, "runtime_overhead": processed_coverage,
                                      "combination_results": combination_results})
         # coverage_results = sorted(coverage_results, key=lambda x: np.mean(x['runtime_overhead']['cpu_mean']))[:5]
         has_baseline = False
-        program_results.append({"program": program_dir, "coverage_results": coverage_results})
+        program_results.append({"program": program, "coverage_results": coverage_results})
     #        exit(1)
     output_file = os.path.join(directory, "measurements.json")
-    print 'Seen {} baselines'.format(baseline)
-    print output_file
+    print('Seen {} baselines'.format(baseline))
+    print(output_file)
     with open(output_file, 'wb') as outfile:
         json.dump(program_results, outfile)
 
 
-#   pprint(program_results)
-
-#    for filename in os.listdir(directory):
-#	if filename.endswith(".bc"):
-#	    print(os.path.join(directory, filename))
-#	continue
-#   else:
-#	continue
-
 def main():
-    binaries_path = "binaries/"
-    if len(sys.argv) > 1:
-        binaries_path = sys.argv[1]
-    print binaries_path
+    parser = argparse.ArgumentParser(description='Collect all performance measures.')
+    parser.add_argument('dir', metavar='DIR', type=str,
+                        help='Directory of the binaries to collect performance measures.')
+    args = parser.parse_args()
 
-    process_files(binaries_path, False)
+    binary_dir = os.path.abspath(args.dir)
+    if not os.path.isdir(os.path.abspath(args.dir)):
+        parser.print_help()
+        return
+
+    process_files(binary_dir, False)
 
 
 if __name__ == "__main__":
     main()
-# For program_dir in binaries:
-#	For coverage_dir in program_dir:
-#		For combination in coverage_dir:
-#			For Input dependent..Random:
-#				For network in combination:
-#					collect result of runexec, coverage,sc input dependent/random
-#					#Goal: protection coverage per instruction or per function (OH, SC, SC+OH)
-#					collect sc.stats, oh.stats, dependency stats
-#					if random:
-# Goal: oh coverage improvements which do not depend on network, nor sc input dependency
-#						collect dependency.stats
-#		Avg and Std (collected results) group by coverage, input-dependent/random

@@ -13,7 +13,7 @@ else
 	exit
 fi
 #run each protected program and measure the overhead imposed by the protection
-./runexec-binaries.py
+./runexec-binaries.py binaries/
 if [ $? -eq 0 ]; then
 	echo 'OK runexec'
 else
@@ -21,7 +21,7 @@ else
 	exit
 fi
 #extract measured cpu and memory overhead
-python measure.py
+./measure.py binaries/
 if [ $? -eq 0 ]; then
 	echo 'OK measure'
 else
