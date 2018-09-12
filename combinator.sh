@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 OPT=opt
 EVAL_LIB=/home/sip/eval/passes/build/lib
 FILES=/home/sip/eval/coverage/*.bc
@@ -5,6 +7,7 @@ coverage_dir=/home/sip/eval/coverage
 CSVPATH=/home/sip/eval/combination/
 num_combination=1
 func_coverage="0 10 25 50 100"
+
 for f in $FILES
 do
 	bitcode=$f
@@ -20,7 +23,15 @@ do
 		if [ $coverage -ne 0 ]; then
 			echo "handling coverage $coverage"
 			echo "Output will be written to $output"
-			${OPT} -load $EVAL_LIB/libEval.so $bitcode -combinator-func -coverage=$coverage -combinations=$num_combination -out-path=$output -o /dev/null
+
+			${OPT} -load $EVAL_LIB/libEval.so \
+			    $bitcode \
+			    -combinator-func \
+			    -coverage=$coverage \
+			    -combinations=$num_combination \
+			    -out-path=$output \
+			    -o /dev/null
+
 			if [ $? -eq 0 ]; then
 				echo 'OK Transform'
 			else

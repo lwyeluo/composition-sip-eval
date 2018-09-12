@@ -4,7 +4,6 @@ set -xeuo pipefail
 CLANG=clang-6.0
 OPT=opt
 LLC=llc
-LLVM_LINK=llvm-link
 
 SC_PATH=/home/dennis/Desktop/self-checksumming
 CF_PATH=/home/dennis/Desktop/composition-framework
@@ -16,20 +15,15 @@ USR_LIB_DIR=/usr/local/lib
 INPUT_DEP_PATH=${USR_LIB_DIR}
 DG_PATH=${USR_LIB_DIR}
 OH_LIB=$OH_PATH/cmake-build-debug
-EVAL_LIB=/home/sip/eval/passes/build/lib
 bc_files=/home/sip/eval/coverage/*.bc
 combination_path=/home/sip/eval/combination/
 binary_path=/home/sip/eval/binaries
 config_path=/home/sip/eval/lib-config/
 link_libraries=/home/sip/eval/link-libraries/
 args_path=/home/sip/eval/cmdline-args/
-#SKIP_EXISTING binaries when exactly one argument is passed here regardless of its value
-repeat=1
-#rm -r binaries
-mkdir -p binaries
+REPEAT=1
 
-#TODO hook intercept library for other applications/feed a constant input
-export LD_PRELOAD="/home/dennis/Desktop/self-checksumming/hook/build/libminm.so"
+mkdir -p binaries
 
 for bc in $bc_files
 do
@@ -82,7 +76,7 @@ do
 			echo "Handling combination file $coverage"
 			echo "Protect $bc with function combination file $coverage"
 			#repeat protection for random network of protection
-			for i in $repeat
+			for i in $REPEAT
 			do
 				recover_attempt=0
 				while true;
@@ -224,22 +218,5 @@ do
 			done
 		done
 	done
-
-	#rm -r $filedir
-	#mkdir -p $filedir
-	#for coverage in $func_coverage
-	#do
-	#		output="$filedir$coverage/"
-	#		mkdir -p $output
-	#		echo "handling coverage $coverage"
-	#		echo "Output will be written to $output"
-	#		opt-6.0 -load $EVAL_LIB/libEval.so $bitcode -combinator-func -coverage=$coverage -combinations=$num_combination -out-path=$output
-	#		if [ $? -eq 0 ]; then
-	#			echo 'OK Transform'
-	#		else
-	#			echo 'FAIL Transform'
-	#			exit
-	#		fi
-	#	done
 done
 echo 'Generator is done!'

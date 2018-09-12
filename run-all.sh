@@ -13,7 +13,7 @@ else
 	exit
 fi
 #run each protected program and measure the overhead imposed by the protection
-sh runexec-binaries.sh
+runexec-binaries.py
 if [ $? -eq 0 ]; then
 	echo 'OK runexec'
 else
