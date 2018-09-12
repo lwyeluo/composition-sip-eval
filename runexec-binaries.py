@@ -87,11 +87,11 @@ def measure_overhead(result_directory, program, repeat):
         # CFI needs to have graph.txt in CWD
         graph_file = os.path.join(result_directory, "graph.txt")
         if os.path.isfile(graph_file):
-            copyfile(graph_file, "./graph.txt")
+            copyfile(graph_file, "graph.txt")
 
         print(str(i), " trying to run:", program_path)
         env = os.environ
-        preload = LD_PRELOAD
+        preload = list(LD_PRELOAD)
         preload.append(os.path.join(result_directory, "librtlib.so"))
         env["LD_PRELOAD"] = ":".join(preload)
 

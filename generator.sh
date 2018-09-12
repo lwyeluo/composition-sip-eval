@@ -14,44 +14,44 @@ OH_PATH=/home/dennis/Desktop/sip-oblivious-hashing
 USR_LIB_DIR=/usr/local/lib
 INPUT_DEP_PATH=${USR_LIB_DIR}
 DG_PATH=${USR_LIB_DIR}
-OH_LIB=$OH_PATH/cmake-build-debug
+OH_LIB=${OH_PATH}/cmake-build-debug
 bc_files=/home/sip/eval/coverage/*.bc
 combination_path=/home/sip/eval/combination/
 binary_path=/home/sip/eval/binaries
 config_path=/home/sip/eval/lib-config/
 link_libraries=/home/sip/eval/link-libraries/
-args_path=/home/sip/eval/cmdline-args/
+args_path=/home/sip/eval/cmdline-args
 REPEAT=1
 
 mkdir -p binaries
 
-for bc in $bc_files
+for bc in ${bc_files}
 do
-	bitcode=$bc
-	echo $bc
+	bitcode=${bc}
+	echo ${bc}
 	filename=${bc##*/}
-	libconfig=$config_path$filename
+	libconfig=${config_path}${filename}
 	cmd_args=""
-	if [ -f $args_path$filename ]; then
-		cmd_args=$(<$args_path$filename)
+	if [ -f "${args_path}/${filename}" ]; then
+		cmd_args="${args_path}/${filename}"
 	fi
 
-	combination_dir=$combination_path$filename/*
+	combination_dir=${combination_path}${filename}/*
 
 	libraries=""
 	if [ -f "${link_libraries}${filename}" ]; then
-		libraries=$(<$link_libraries$filename)
+		libraries=$(<${link_libraries}${filename})
 	fi
 
 	echo "Libraries to link with $libraries"
-	for coverage_dir in $combination_dir
+	for coverage_dir in ${combination_dir}
 	do
 		coverage_name=${coverage_dir##*/}
-		output_dir=$binary_path/$filename/$coverage_name
-		mkdir -p $output_dir
+		output_dir=${binary_path}/${filename}/${coverage_name}
+		mkdir -p ${output_dir}
 		#Generate unprotected binary for the baseline
 
-		if [ $coverage_name -eq 0 ]; then
+		if [ ${coverage_name} -eq 0 ]; then
 			#avoid regenerating if desired
 
 			if [ $# -eq 1 ]; then
@@ -63,26 +63,26 @@ do
                         echo "Skipping $output_dir"
                         CONT=1
                     else
-                        mkdir -p $output_dir/0/1
+                        mkdir -p ${output_dir}/0/1
                     fi
                 } 200>/var/lock/cfgenerator
                 if [ "$CONT" -eq "1" ]; then
                     continue
                 fi
             else
-                mkdir -p $output_dir/0/1
+                mkdir -p ${output_dir}/0/1
 			fi
 			echo "Handling baseline"
-			${LLC} $bitcode -o $output_dir/out.s
+			${LLC} ${bitcode} -o ${output_dir}/out.s
 			#make a dummy combination=0 and a dummy attempt=1 just for the sake of complying with the directory structure
-			g++ -no-pie -fPIC -std=c++0x -g -rdynamic $output_dir/out.s -o $output_dir/0/1/$filename $libraries
-			rm $output_dir/out.s
+			g++ -no-pie -fPIC -std=c++0x -g -rdynamic ${output_dir}/out.s -o ${output_dir}/0/1/${filename} ${libraries}
+			rm ${output_dir}/out.s
 			continue
 		fi
-		for coverage in $coverage_dir/*
+		for coverage in ${coverage_dir}/*
 		do
 			combination_file=${coverage##*/}
-			output_dir=$binary_path/$filename/$coverage_name/$combination_file
+			output_dir=${binary_path}/${filename}/${coverage_name}/${combination_file}
 			#avoid regenerating if desired
 			if [ $# -eq 1 ]; then
                 CONT=0
@@ -93,26 +93,26 @@ do
                         echo "Skipping $output_dir"
                         CONT=1
                     else
-                        mkdir -p $output_dir
+                        mkdir -p ${output_dir}
                     fi
                 } 200>/var/lock/cfgenerator
                 if [ "$CONT" -eq "1" ]; then
                     continue
                 fi
 			else
-               mkdir -p $output_dir
+               mkdir -p ${output_dir}
             fi
 
 			echo "Handling combination file $coverage"
 			echo "Protect $bc with function combination file $coverage"
 			#repeat protection for random network of protection
-			for i in $REPEAT
+			for i in ${REPEAT}
 			do
 				recover_attempt=0
 				while true;
 				do
-					output_dir=$binary_path/$filename/$coverage_name/$combination_file/$i
-					mkdir -p $output_dir
+					output_dir=${binary_path}/${filename}/${coverage_name}/${combination_file}/${i}
+					mkdir -p ${output_dir}
 					echo "Protect here $i"
 
 					echo 'Remove old files'
@@ -174,7 +174,7 @@ do
 					${cmd} |& tee "${output_dir}/transform.console"
 
 
-					echo $output_dir
+					echo ${output_dir}
 					if [ $? -eq 0 ]; then
 						echo 'OK Transform'
 					else
@@ -185,7 +185,7 @@ do
 
 					# compiling external libraries to bitcodes
 					LIB_FILES=()
-					gcc -no-pie -fPIC $OH_PATH/assertions/response.c -c -o "${output_dir}/oh_rtlib.o"
+					gcc -no-pie -fPIC ${OH_PATH}/assertions/response.c -c -o "${output_dir}/oh_rtlib.o"
 					LIB_FILES+=( "${output_dir}/oh_rtlib.o" )
 
 					gcc -no-pie -fPIC -g -rdynamic -c "${output_dir}/NewStackAnalysis.c" -o "${output_dir}/cfi_rtlib.o"
@@ -199,7 +199,7 @@ do
 
 
 					echo 'Post patching binary after hash calls'
-					${LLC} $output_dir/out.bc -o $output_dir/out.s
+					${LLC} ${output_dir}/out.bc -o ${output_dir}/out.s
 					if [ $? -eq 0 ]; then
 						echo 'OK Transform'
 					else
@@ -207,7 +207,7 @@ do
 						exit
 					fi
 
-					gcc -no-pie -fPIC -rdynamic $output_dir/out.s -o $output_dir/$filename -L ${output_dir} -lrtlib $libraries
+					gcc -no-pie -fPIC -rdynamic ${output_dir}/out.s -o ${output_dir}/${filename} -L ${output_dir} -lrtlib ${libraries}
 					if [ $? -eq 0 ]; then
 						echo 'OK gcc final binary'
 					else
@@ -219,28 +219,28 @@ do
 
 					cp "${output_dir}/${filename}" "${output_dir}/${filename}_backup"
 					#remove temp files
-					rm $output_dir/out.s ||:
+					rm ${output_dir}/out.s ||:
 
 					#Patch using GDB
 					echo 'Starting GDB patcher, this will wait for input when nothing is provided'
-					python "${CF_PATH}/hook/patcher.py" "${output_dir}/${filename}" -m "${output_dir}/cf-patchinfo.json" -p "patchers.json" -o "${output_dir}" --args "${cmd_args}" >> "${output_dir}/patcher.console"
+					python "${CF_PATH}/hook/patcher.py" "${output_dir}/${filename}" -m "${output_dir}/cf-patchinfo.json" -p "patchers.json" -o "${output_dir}" --args-path "${cmd_args}" |& tee "${output_dir}/patcher.console"
 
 					if [ $? -eq 0 ]; then
 						echo 'OK GDB Patch'
-						if [ -f $output_dir/$filename"tmp" ]; then
-							mv $output_dir/$filename"tmp" $output_dir/$filename
+						if [ -f ${output_dir}/${filename}"tmp" ]; then
+							mv ${output_dir}/${filename}"tmp" ${output_dir}/${filename}
 						fi
-						chmod +x $output_dir/$filename
+						chmod +x ${output_dir}/${filename}
 						recover_attempt=0
 						break # BREAK the while loop
 					else
 						echo "$? FAIL GDB Patch"
-						if [ $recover_attempt -eq 1 ]; then
+						if [ ${recover_attempt} -eq 1 ]; then
 							echo "Failed to recover for three times"
 							echo "Check $output_dir for more details"
 							break #exit 1
 						fi
-						echo "trying to recover from Segmentation fault... $recover_attempt" >> $output_dir/segmentationfault.console
+						echo "trying to recover from Segmentation fault... $recover_attempt" >> ${output_dir}/segmentationfault.console
 						recover_attempt=$((recover_attempt+1))
 					fi
 
