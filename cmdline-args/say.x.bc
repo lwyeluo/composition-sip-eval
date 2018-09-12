@@ -1,1 +1,5 @@
- -a -q -o small_output.au < /home/sip/eval/cmdline-args/rsynth_smallinput.txt
+-a
+-q
+-o
+small_output.au 
+< /home/sip/eval/cmdline-args/rsynth_smallinput.txt

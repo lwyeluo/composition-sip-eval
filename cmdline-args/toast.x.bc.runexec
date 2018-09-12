@@ -1,1 +1,3 @@
- -fps -c /home/sip/eval/cmdline-args/toast_input_small.au
+-fps
+-c
+/home/sip/eval/cmdline-args/toast_input_small.au

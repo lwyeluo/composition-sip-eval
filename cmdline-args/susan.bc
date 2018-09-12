@@ -1,1 +1,3 @@
-/home/sip/eval/cmdline-args/susan_input_small.pgm output_small.smoothing.pgm -s
+/home/sip/eval/cmdline-args/susan_input_small.pgm
+output_small.smoothing.pgm
+-s
