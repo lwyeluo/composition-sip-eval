@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 OPT=opt
-USR_LIB_DIR=/usr/local/lib/
+USR_LIB_DIR=/usr/local/lib
 FILES=/home/sip/eval/local_dataset/*.bc
 COVERAGEPATH=/home/sip/eval/coverage/
 configs=/home/sip/eval/lib-config
