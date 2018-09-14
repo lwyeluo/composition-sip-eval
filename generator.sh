@@ -1,6 +1,6 @@
 
 #!/usr/bin/env bash
-set -xeuo pipefail
+set -euo pipefail
 
 CLANG=clang-6.0
 OPT=opt
