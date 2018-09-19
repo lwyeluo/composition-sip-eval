@@ -144,7 +144,10 @@ do
                 cmd="${cmd} -globaldce"
                 cmd="${cmd} -use-cache"
                 cmd="${cmd} -goto-unsafe"
-                cmd="${cmd} -profile-use=${blockfrequency}/${filename}.prof"
+                cmd="${cmd} -block-freq"
+                cmd="${cmd} -pgo-instr-use"
+                cmd="${cmd} -pgo-test-profile-file=${blockfrequency}/${filename}/${filename}.prof"
+                cmd="${cmd} -profile-sample-accurate"
                 # SC flags
                 cmd="${cmd} -use-other-functions"
                 cmd="${cmd} -connectivity=1"
