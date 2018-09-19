@@ -22,8 +22,8 @@ binary_path=/home/sip/eval/binaries
 config_path=/home/sip/eval/lib-config/
 link_libraries=/home/sip/eval/link-libraries/
 args_path=/home/sip/eval/cmdline-args
-REPEAT=( 0 )
-#REPEAT=( 0 1 )
+#REPEAT=( 0 )
+REPEAT=( 0 1 )
 STRATEGIES=('random' 'avoidance' )
 
 mkdir -p binaries
@@ -90,7 +90,7 @@ do
 			echo "Handling combination file $coverage"
 			echo "Protect $bc with function combination file $coverage"
 			#repeat protection for random network of protection
-			for i in ${REPEAT}
+			for i in ${REPEAT[@]}
 			do
 			    output_dir=${binary_path}/${filename}/${coverage_name}/${combination_file}/${i}
 				echo "Protect here $i"
@@ -131,12 +131,12 @@ do
                 cmd="${cmd} -load ${INPUT_DEP_PATH}/libInputDependency.so"
                 cmd="${cmd} -load ${DG_PATH}/libLLVMdg.so"
                 cmd="${cmd} -load ${USR_LIB_DIR}/libUtils.so"
-                cmd="${cmd} -load ${USR_LIB_DIR}/libCompositionFramework.so "
+                cmd="${cmd} -load ${USR_LIB_DIR}/libCompositionFramework.so"
                 cmd="${cmd} -load ${USR_LIB_DIR}/libSCPass.so"
                 cmd="${cmd} -load ${OH_LIB}/liboblivious-hashing.so"
                 cmd="${cmd} -load ${INPUT_DEP_PATH}/libTransforms.so"
-                cmd="${cmd} -load ${CFI_PATH}/cmake-build-release/libControlFlowIntegrity.so"
-                cmd="${cmd} -load ${CMM_PATH}/cmake-build-release/libCodeMobilityMock.so"
+                cmd="${cmd} -load ${CFI_PATH}/cmake-build-debug/libControlFlowIntegrity.so"
+                cmd="${cmd} -load ${CMM_PATH}/cmake-build-debug/libCodeMobilityMock.so"
                 # General flags
                 cmd="${cmd} -strip-debug"
                 cmd="${cmd} -unreachableblockelim"
@@ -144,7 +144,6 @@ do
                 cmd="${cmd} -use-cache"
                 cmd="${cmd} -goto-unsafe"
                 # SC flags
-#                cmd="${cmd} -extracted-only"
                 cmd="${cmd} -use-other-functions"
                 cmd="${cmd} -connectivity=1"
                 cmd="${cmd} -dump-checkers-network=${output_dir}/network_file"
@@ -170,6 +169,7 @@ do
                 cmd="${cmd} -oh-insert"
                 cmd="${cmd} -short-range-oh"
                 cmd="${cmd} -constraint-protection"
+		cmd="${cmd} -debug-pass=Structure"
                 # End of command
                 ${cmd} |& tee "${output_dir}/transform.console"
 
@@ -185,7 +185,7 @@ do
 
                 # compiling external libraries to bitcodes
                 LIB_FILES=()
-                gcc -no-pie -fPIC ${OH_PATH}/assertions/response.c -c -o "${output_dir}/oh_rtlib.o"
+                g++ -no-pie -fPIC ${OH_PATH}/assertions/response_broken.cpp -c -o "${output_dir}/oh_rtlib.o"
                 LIB_FILES+=( "${output_dir}/oh_rtlib.o" )
 
                 gcc -no-pie -fPIC -g -rdynamic -c "${output_dir}/NewStackAnalysis.c" -o "${output_dir}/cfi_rtlib.o"

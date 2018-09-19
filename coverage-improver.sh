@@ -35,6 +35,7 @@ do
         -goto-unsafe \
         -extract-functions \
         -transparent-cache \
+	-delete-unreachables \
         -dependency-stats \
         -dependency-stats-file=$output_dir/dependency.stats \
         -extraction-stats \

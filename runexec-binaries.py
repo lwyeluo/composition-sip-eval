@@ -93,6 +93,7 @@ def measure_overhead(result_directory, program, repeat):
         env = os.environ
         preload = list(LD_PRELOAD)
         preload.append(os.path.join(result_directory, "librtlib.so"))
+#        preload.append( "/home/dennis/Desktop/composition-framework/cmake-build-debug/librtlib.so")
         env["LD_PRELOAD"] = ":".join(preload)
 
         output_log = os.path.join(result_directory, 'output_' + str(i) + '.log')
