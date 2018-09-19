@@ -22,6 +22,7 @@ binary_path=/home/sip/eval/binaries
 config_path=/home/sip/eval/lib-config/
 link_libraries=/home/sip/eval/link-libraries/
 args_path=/home/sip/eval/cmdline-args
+blockfrequency=/home/sip/eval/blockfrequency
 #REPEAT=( 0 )
 REPEAT=( 0 1 )
 STRATEGIES=('random' 'avoidance' )
@@ -143,6 +144,7 @@ do
                 cmd="${cmd} -globaldce"
                 cmd="${cmd} -use-cache"
                 cmd="${cmd} -goto-unsafe"
+                cmd="${cmd} -profile-use=${blockfrequency}/${filename}.prof"
                 # SC flags
                 cmd="${cmd} -use-other-functions"
                 cmd="${cmd} -connectivity=1"
