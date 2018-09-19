@@ -169,7 +169,7 @@ do
                 cmd="${cmd} -oh-insert"
                 cmd="${cmd} -short-range-oh"
                 cmd="${cmd} -constraint-protection"
-		cmd="${cmd} -debug-pass=Structure"
+		        cmd="${cmd} -time-passes"
                 # End of command
                 ${cmd} |& tee "${output_dir}/transform.console"
 
@@ -222,8 +222,8 @@ do
                 #rm ${output_dir}/out.s ||:
 
                 echo 'Starting patcher, this will wait for input when nothing is provided'
-		echo python "${CF_PATH}/hook/patcher.py" "${output_dir}/${filename}" -m "${output_dir}/cf-patchinfo.json" -p "patchers.json" -o "${output_dir}" --args-path "${cmd_args}" &> "${output_dir}/patcher.console" >> "${output_dir}/transform.console"
-                python "${CF_PATH}/hook/patcher.py" "${output_dir}/${filename}" -m "${output_dir}/cf-patchinfo.json" -p "patchers.json" -o "${output_dir}" --args-path "${cmd_args}" &> "${output_dir}/patcher.console"
+		        echo python "${CF_PATH}/hook/patcher.py" "${output_dir}/${filename}" -m "${output_dir}/cf-patchinfo.json" -p "patchers.json" -o "${output_dir}" --args-path "${cmd_args}" &> "${output_dir}/patcher.console"
+                /usr/bin/time -f "totaltime: %e %U %S" -o "${output_dir}/patchTime.txt" python "${CF_PATH}/hook/patcher.py" "${output_dir}/${filename}" -m "${output_dir}/cf-patchinfo.json" -p "patchers.json" -o "${output_dir}" --args-path "${cmd_args}" &> "${output_dir}/patcher.console"
 
                 if [ $? -eq 0 ]; then
                     echo 'OK GDB Patch'

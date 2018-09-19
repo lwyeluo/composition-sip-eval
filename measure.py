@@ -1,243 +1,82 @@
 #!/usr/bin/env python
-# Run benchmarks pseudo code
+# coding: utf-8
+
+# In[1]:
+
 
 from __future__ import print_function
-import argparse
 import os
 import json
-from pprint import pprint
 import numpy as np
+import pandas as pd
+from pandas.io.json import json_normalize
 
-oh_results = {}
-sc_results = {}
+
+# In[2]:
 
 
 def get_immediate_subdirectories(d):
     return filter(os.path.isdir, [os.path.join(d, f) for f in os.listdir(d)])
 
 
-def grab_results(result_directory, protection_stats=True):
-    # Baseline do not have protection stats
-    print(result_directory)
-    oh_result = {}
-    sc_result = {}
-    if protection_stats:
-        oh_result = json.load(open(os.path.join(result_directory, "oh.stats")))
-        # pprint(oh_result)
-        sc_result = json.load(open(os.path.join(result_directory, "sc.stats")))
-    runs_path = os.path.join(result_directory, "runs.json")
-    runs_result = {}
-    if os.path.exists(runs_path):
-        runs_result = json.load(open(runs_path))
-    # else:
-    #   print runs_path, ' not found'
-    r_path = os.path.join(result_directory, "runs_processed.json")
-    runs_processed = {}
-    if os.path.exists(r_path):
-        # print "loading", r_path
-        runs_processed = json.load(open(os.path.join(result_directory, "runs_processed.json")))
-        # pprint(sc_result)
-        # TODO: grab any other result file
-        if protection_stats and (not sc_result or not oh_result):
-            print("Err. sc stats or oh stats are empty ", result_directory)
-            exit(1)
-    # else:
-    #   print r_path, " not found"
-    return {"sc_result": sc_result, "oh_result": oh_result, "runs": runs_result, "runs_processed": runs_processed}
+# In[3]:
 
 
-def process_results(coverage, results, protection_stats, baseline_cpu_mean):
-    # TODO do whatever and add outcome(s) to the results file
-    # print "process me"
-    # pprint(results)
-    coverage_cpu_reads = []
-    coverage_memory_reads = []
-    number_sensitive_inst = []
-    number_oh_protected_inst = []
-    number_sroh_protected_inst = []
-    number_sc_protected_inst = []
-    number_sc_oh_protected_inst = []
-    number_sc_sroh_protected_inst = []
-
-    for combination in results:
-        for attempt in combination['attempt_results']:
-            # collect runs
-            # coverage 0 does not have any SC OH info, it's the baseline
-            if coverage != '0' and protection_stats:
-                if 'numberOfSensitiveInstructions' in attempt['results']['sc_result']:
-                    number_sensitive_inst.append(attempt['results']['sc_result']['numberOfSensitiveInstructions'])
-                if 'numberOfProtectedInstructions' not in attempt['results']['sc_result']:
-                    print(coverage, attempt['results'])
-                    exit(1)
-                number_sc_protected_inst.append(attempt['results']['sc_result']['numberOfProtectedInstructions'])
-                number_oh_protected_inst.append(attempt['results']['oh_result']['numberOfProtectedInstructions'])
-                number_sroh_protected_inst.append(
-                    attempt['results']['oh_result']['numberOfShortRangeProtectedInstructions'])
-                number_sc_oh_protected_inst.append(
-                    attempt['results']['oh_result']['numberOfImplicitlyProtectedInstructions'])
-                number_sc_sroh_protected_inst.append(
-                    attempt['results']['oh_result']['numberOfShortRangeImplicitlyProtectedInstructions'])
-
-            coverage_cpu_reads.extend([d['cputime'] for d in attempt['results']['runs'] if 'cputime' in d])
-            coverage_memory_reads.extend([d['memory'] for d in attempt['results']['runs'] if 'memory' in d])
-    coverage_result = {}
-
-    sensitive_inst = np.array(number_sensitive_inst).astype(np.float)
-    coverage_result['sensitive_inst_mean'] = np.mean(sensitive_inst)
-    coverage_result['sensitive_inst_std'] = np.std(sensitive_inst)
-
-    sc_protected_inst = np.array(number_sc_protected_inst).astype(np.float)
-    coverage_result['sc_protected_mean'] = np.mean(sc_protected_inst)
-    coverage_result['sc_protected_std'] = np.std(sc_protected_inst)
-    # if len(sc_protected_inst)==0:
-    #    print 'ERR. SC array is ZERO'
-    # else:
-    #    print 'INFO. SC mean for ', coverage, ' is ',coverage_result['sc_protected_mean']
-
-    oh_protected_inst = np.array(number_oh_protected_inst).astype(np.float)
-    coverage_result['oh_protected_mean'] = np.mean(oh_protected_inst)
-    coverage_result['oh_protected_std'] = np.std(oh_protected_inst)
-
-    sc_oh_protected_inst = np.array(number_sc_oh_protected_inst).astype(np.float)
-    coverage_result['sc_oh_protected_inst_mean'] = np.mean(sc_oh_protected_inst)
-    coverage_result['sc_oh_protected_inst_std'] = np.std(sc_oh_protected_inst)
-
-    sroh_protected_inst = np.array(number_sroh_protected_inst).astype(np.float)
-    coverage_result['sroh_protected_mean'] = np.mean(sroh_protected_inst)
-    coverage_result['sroh_protected_std'] = np.std(sroh_protected_inst)
-
-    sc_sroh_protected_inst = np.array(number_sc_sroh_protected_inst).astype(np.float)
-    coverage_result['sc_sroh_protected_inst_mean'] = np.mean(sc_sroh_protected_inst)
-    coverage_result['sc_sroh_protected_inst_std'] = np.std(sc_sroh_protected_inst)
-
-    # print coverage_cpu_reads
-    # print sorted(coverage_cpu_reads)[:5]
-    #    coverage_cpu_reads = sorted(coverage_cpu_reads)[:5]
-    # coverage_raw_means  = coverage_cpu_reads
-    # good_reads = []
-    #    for raw_mean in coverage_raw_means:
-    #       if float(raw_mean) >= baseline_cpu_mean:
-    #          good_reads.append(raw_mean)
-    coverage_result['cpu_mean'] = np.mean(np.array(coverage_cpu_reads).astype(np.float))
-    coverage_result['cpu_std'] = np.std(np.array(coverage_cpu_reads).astype(np.float))
-    coverage_result['mem_mean'] = np.mean(np.array(coverage_memory_reads).astype(np.float))
-    coverage_result['mem_std'] = np.std(np.array(coverage_memory_reads).astype(np.float))
-    # if mean is less than the baseline skip it, it doesn't make any sense
-    if coverage != '0' and coverage_result['cpu_mean'] < baseline_cpu_mean:
-        # coverage_cpu_reads = []
-        print('bad measure cpu_mean={}, baseline={} {} '.format(
-            coverage_result['cpu_mean'],
-            baseline_cpu_mean,
-            coverage
-        ))
-    # print coverage
-    # pprint(coverage_result)
-    sanity_result = {}
-    coverage_cpu_reads = np.array(coverage_cpu_reads).astype(np.float)
-
-    if len(coverage_cpu_reads) == 0:
-        coverage_result['cpu_mean'] = 0
-        coverage_result['cpu_std'] = 0
-        coverage_result['mem_mean'] = 0
-        coverage_result['mem_std'] = 0
-
-        return False, coverage_result
-
-    sanity_result['min'] = np.min(coverage_cpu_reads)
-    sanity_result['max'] = np.max(coverage_cpu_reads)
-    sanity_result['median'] = np.median(coverage_cpu_reads)
-    sanity_result['percentile_90'] = np.percentile(coverage_cpu_reads, 90.0)
-    sanity_result['percentile_50'] = np.percentile(coverage_cpu_reads, 50.0)
-    sanity_result['percentile_80'] = np.percentile(coverage_cpu_reads, 80.0)
-    sanity_result['percentile_40'] = np.percentile(coverage_cpu_reads, 40.0)
-    sanity_result['percentile_30'] = np.percentile(coverage_cpu_reads, 30.0)
-    # pprint(sanity_result)
-    # print "Coverage results:", coverage
-    # pprint(coverage_result)
-    print('Coverage means:')
-    pprint(coverage_cpu_reads)
-    return True, coverage_result
-
-
-def process_files(directory, protection_stats):
-    program_results = []
-    baseline = 0
+def process_files(directory):
+    all_df = pd.DataFrame()
     for program_dir in get_immediate_subdirectories(directory):
         program = os.path.basename(program_dir)
-        print('handling ', program_dir)
-        coverage_results = []
-        has_baseline = False
-        baseline_cpu_mean = 0
         for coverage_dir in sorted(get_immediate_subdirectories(program_dir)):
             coverage = os.path.basename(coverage_dir)
-            combination_results = []
-            seen_combs = ''
-            print('looking here:{}'.format(coverage_dir))
+
             for combination_dir in get_immediate_subdirectories(coverage_dir):
-                attempt_results = []
                 combination = os.path.basename(combination_dir)
 
                 for attempt_dir in get_immediate_subdirectories(combination_dir):
-                    print(attempt_dir)
                     result_path = attempt_dir
                     attempt = os.path.basename(attempt_dir)
 
-                    # if baseline no protection stats
-                    results = grab_results(result_path, coverage != "0" and protection_stats)
-                    if len(results['runs_processed']) <= 1:
-                        print("No runtime measurement for {}".format(result_path))
-                    # else:
-                    #   print "Found {} run results".format(len(results['runs_processed']))
-                    # print results['runs_processed']
-                    attempt_results.append({"results": results, "attempt": attempt})
-                combination_results.append({"combination": combination, "attempt_results": attempt_results})
-                print(coverage)
-                seen_combs = seen_combs + ' ' + combination
-            print('Seen combinations:{}'.format(seen_combs))
-            good, processed_coverage = process_results(coverage, combination_results, protection_stats,
-                                                       baseline_cpu_mean)
-
-            if coverage == "0":
-                baseline_cpu_mean = processed_coverage['cpu_mean']
-                print('Baseline computed for {} ={}'.format(program, baseline_cpu_mean))
-                baseline += 1
-                has_baseline = True
-            else:
-                print('{} {} coverage mean={} coverage std={}'.format(program, coverage,
-                                                                      processed_coverage['cpu_mean'],
-                                                                      processed_coverage['cpu_std']))
-            if not has_baseline:
-                print('No baseline found for {}'.format(program))
-                exit(1)
-            if not good:
-                print('ERR. no results for coverage {} of program {}'.format(coverage, program))
-                print('Adding zero result for the sake of the perfromance plots')
-            coverage_results.append({"coverage": coverage, "runtime_overhead": processed_coverage,
-                                     "combination_results": combination_results})
-        # coverage_results = sorted(coverage_results, key=lambda x: np.mean(x['runtime_overhead']['cpu_mean']))[:5]
-        has_baseline = False
-        program_results.append({"program": program, "coverage_results": coverage_results})
-    #        exit(1)
-    output_file = os.path.join(directory, "measurements.json")
-    print('Seen {} baselines'.format(baseline))
-    print(output_file)
-    with open(output_file, 'wb') as outfile:
-        json.dump(program_results, outfile)
+                    results = grab_results(result_path)
+                    
+                    raw = json_normalize(data=results)
+                    df = raw[['cputime', 'memory']]
+                    df.insert(0, 'attempt', int(attempt))
+                    df.insert(0, 'combination', int(combination))
+                    df.insert(0, 'coverage', int(coverage))
+                    df.insert(0, 'program', program)
+                    all_df = all_df.append(df, sort=False)
+                    
+    return all_df
 
 
-def main():
-    parser = argparse.ArgumentParser(description='Collect all performance measures.')
-    parser.add_argument('dir', metavar='DIR', type=str,
-                        help='Directory of the binaries to collect performance measures.')
-    args = parser.parse_args()
-
-    binary_dir = os.path.abspath(args.dir)
-    if not os.path.isdir(os.path.abspath(args.dir)):
-        parser.print_help()
-        return
-
-    process_files(binary_dir, False)
+# In[4]:
 
 
-if __name__ == "__main__":
-    main()
+def grab_results(result_directory):
+    runs_path = os.path.join(result_directory, "runs.json")
+    if os.path.exists(runs_path):
+        return json.load(open(runs_path))
+    return [{'cputime': 0, 'memory': 0}]
+
+
+# In[5]:
+
+
+def process_results(df):
+    grouped = df.groupby([df['program'], df['coverage'], df['attempt']])
+    return grouped.agg([np.min, np.max, np.median, np.mean, np.std])
+
+
+# In[14]:
+
+
+df = process_files("/home/sip/eval/binaries")
+df = df.drop(columns=['combination'])
+df = process_results(df[df['attempt'] == 1]).sort_values(['program', 'coverage'])
+df = df.round(2)
+
+df.columns = df.columns.map('_'.join)
+df = df.reset_index()
+df = df.fillna(0)
+df.to_csv(os.path.join("/home/sip/eval/binaries", "measurements.csv"), index=False)
+df.to_json(os.path.join("/home/sip/eval/binaries", "measurements.json"), orient='records')
