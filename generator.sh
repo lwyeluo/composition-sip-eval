@@ -24,7 +24,8 @@ link_libraries=/home/sip/eval/link-libraries/
 args_path=/home/sip/eval/cmdline-args
 blockfrequency=/home/sip/eval/blockfrequency
 #REPEAT=( 0 )
-REPEAT=( 0 1 )
+#REPEAT=( 0 1 )
+REPEAT=( 1 )
 STRATEGIES=('random' 'avoidance' )
 
 mkdir -p binaries

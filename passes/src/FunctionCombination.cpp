@@ -54,6 +54,7 @@ std::vector<std::vector<std::string>> generateRandomCombinations(int totalNumber
 				duplicate_map[random_index]=1;
 				combination.push_back(allFunctions[random_index]);
 			}
+			assert(combination.size() > 0);
 			allCombinations.push_back(combination);
 		}
 	}
@@ -86,7 +87,7 @@ bool FunctionCombinationPass::runOnModule(llvm::Module &M) {
 		allFunctions.push_back(F.getName());
 	}
 	float coverage_number = Coverage/100.0 * allFunctions.size(); 
-	int k = round(coverage_number);
+	int k = ceil(coverage_number);
 	if (k>allFunctions.size()) k=allFunctions.size();
 	dbgs()<<"all functions:"<<allFunctions.size()<<"coverage:"<<coverage_number<<" equavalent to:"<<k<<" functions\n";
 	//Make sure that we can generate the combination

@@ -9,13 +9,10 @@ import argparse
 
 def read(file_path):
     data = json.load(open(file_path))
-    overhead = {}
-    program_count = len(data)
-    print('len(data)=', program_count)
-
     data = sorted(data, key=lambda x: x['program'])
-    for program in data:
 
+    overhead = {}
+    for program in data:
         if program['coverage'] not in overhead:
             overhead[program['coverage']] = {}
             overhead[program['coverage']]['cpu_means'] = []
@@ -36,18 +33,7 @@ def prepare_xtick_labels(coverage_labels, programs, E, N, M):
     i = 0
     for p in programs:
         # 2 is index of 25 in the labels, -1 because index starts from 0
-        coverage_labels[i + 2] = p. \
-            replace('.bc', ''). \
-            replace('.x', ''). \
-            replace('_testapp', ''). \
-            replace('_game', ''). \
-            replace('_large', '-l'). \
-            replace('_small', '-s'). \
-            replace('raw', ''). \
-            replace('search', 'srch'). \
-            replace('sort', 'srt'). \
-            replace('basicmath', 'bm'). \
-            replace('dijkstra', 'dkstra')
+        coverage_labels[i + 2] = p
         # print 'i:{},M:{}'.format(i, M)
         i += M + E
     return coverage_labels
@@ -67,7 +53,7 @@ def overhead_in_percentage(overheads):
             perc_cpu_mean = 0
             if baseline['cpu_means'][i] != 0:
                 cpu_scale = (cpu_mean - baseline['cpu_means'][i]) / baseline['cpu_means'][i]
-                perc_cpu_mean = (cpu_mean - baseline['cpu_means'][i]) / baseline['cpu_means'][i] * 100
+                perc_cpu_mean = cpu_scale * 100
             scale.append(cpu_scale)
             overheads[overhead_key]['perc_cpu_means'].append(perc_cpu_mean)
             i += 1
@@ -75,11 +61,11 @@ def overhead_in_percentage(overheads):
         for cpu_std in overheads[overhead_key]['cpu_stds']:
             perc_cpu_std = 0
             if overheads[overhead_key]['cpu_means'][i] != 0:
-                perc_cpu_std = scale[i] * cpu_std / overheads[overhead_key]['cpu_means'][
-                    i] * 100  # (cpu_std - baseline['cpu_stds'][i]) / cpu_std *100
+                # (cpu_std - baseline['cpu_stds'][i]) / cpu_std *100
+                perc_cpu_std = scale[i] * cpu_std / overheads[overhead_key]['cpu_means'][i] * 100
             overheads[overhead_key]['perc_cpu_stds'].append(perc_cpu_std)
             i += 1
-    # pprint (overheads)
+
     return overheads
 
 
@@ -91,7 +77,7 @@ def main():
                         help='Output filename, default is perfromance-evaluation-[percentage]', required=False,
                         type=str, default=None)
     parser.add_argument('-m', action='store', dest='measuresfile', help='measures file', required=False, type=str,
-                        default='binaries/measurements.json')
+                        default='binaries/measurements-1.json')
     parser.add_argument('-w', action='store', dest='width',
                         help='Output filename, default is perfromance-evaluation-[percentage]', required=False,
                         type=float, default=0.35)
@@ -106,37 +92,7 @@ def main():
 
     print(overheads[0]['programs'])
     program_count = len(overheads[0]['programs'])
-
-    coverage_labels = []
-    E = 1  # number of empty gaps between programs
-    N = program_count  # Number of programs in the dataset len(overheads)
-    M = len(overheads)  # number of different coverages
-    if OVERHEAD_IN_PERCENTAGE:
-        M = M - 1
-    fig, ax = plt.subplots()
-    width = results.width
-    # ind_width=0.00
-    print('program count:', N, ' coverage count:', M)
-    ind = np.arange(0, program_count * (M + E) * width,
-                    width)  # Number of bars we need is in total N (programs) times M (coverages)
-    print('total columns:', len(ind))
-    # exit(1)
-    rects = []
-    coverage_color = {}
-    if not OVERHEAD_IN_PERCENTAGE:
-        coverage_color[0] = 'w'
-    coverage_color[10] = '#dce1ea'
-    coverage_color[50] = '#a4a7ad'
-    coverage_color[100] = '#83868c'
-    coverage_color[25] = 'w'
-
-    coverage_hatch = {}
-    if not OVERHEAD_IN_PERCENTAGE:
-        coverage_hatch[0] = '//'
-    coverage_hatch[10] = '0'
-    coverage_hatch[50] = 'x'
-    coverage_hatch[100] = 'o'
-    coverage_hatch[25] = "."
+    coverage_color = {0: 'w', 10: '#dce1ea', 50: '#a4a7ad', 100: '#83868c', 25: 'w'}
 
     means_dic_name = 'cpu_means'
     stds_dic_name = 'cpu_stds'
@@ -144,14 +100,27 @@ def main():
     if OVERHEAD_IN_PERCENTAGE:
         means_dic_name = 'perc_cpu_means'
         stds_dic_name = 'perc_cpu_stds'
+        del overheads[0]
+        del coverage_color[0]
+
+    E = 1  # number of empty gaps between programs
+    N = program_count  # Number of programs in the dataset len(overheads)
+    M = len(overheads)  # number of different coverages
+    fig, ax = plt.subplots()
+    width = results.width
+    # ind_width=0.00
+    print('program count:', N, ' coverage count:', M)
+    ind = np.arange(0, program_count * (M + E) * width,
+                    width)  # Number of bars we need is in total N (programs) times M (coverages)
+    print('total columns:', len(ind))
 
     coverage_keys = overheads.keys()
     coverage_keys.sort()
-    # keys(1)
+
     i = 0
+    rects = []
+    coverage_labels = []
     for coverage in coverage_keys:
-        if coverage is 0 and OVERHEAD_IN_PERCENTAGE:
-            continue
         coverage_labels.append('')
         ax_color = coverage_color[coverage]
         print('coverage {} mean:{} std: {} median:{}'.format(coverage, np.mean(overheads[coverage][means_dic_name]),
@@ -174,7 +143,7 @@ def main():
     ax.set_yscale('log', basey=2)
 
     plt.xticks(rotation=60)
-    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='upper right', ncol=4, mode="expand", borderaxespad=0.)
+    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='upper right', ncol=M, mode="expand", borderaxespad=0.)
 
     plt.subplots_adjust(bottom=0.30)
     fig_name = 'performance-evaluation'
