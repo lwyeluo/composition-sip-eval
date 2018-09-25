@@ -184,54 +184,54 @@ columns = {'actualManifests': 'manifests',
            'stats_numberOfProtectedInstructionsByType_cfi': 'instructions_cfi',
            'stats_numberOfProtectedInstructionsByType_cm': 'instructions_cm',
 
-           'stats_protectionConnectivity_oh_hash_0_avg': 'function_connectivity_oh_hash_avg',
-           'stats_protectionConnectivity_oh_hash_0_std': 'function_connectivity_oh_hash_std',
-           'stats_protectionConnectivity_oh_hash_0_variance': 'function_connectivity_oh_hash_variance',
-           'stats_protectionConnectivity_oh_hash_1_avg': 'instruction_connectivity_oh_hash_avg',
-           'stats_protectionConnectivity_oh_hash_1_std': 'instruction_connectivity_oh_hash_std',
-           'stats_protectionConnectivity_oh_hash_1_variance': 'instruction_connectivity_oh_hash_variance',
+           'stats_protectionConnectivity_oh_hash_1_avg': 'function_connectivity_oh_hash_avg',
+           'stats_protectionConnectivity_oh_hash_1_std': 'function_connectivity_oh_hash_std',
+           'stats_protectionConnectivity_oh_hash_1_variance': 'function_connectivity_oh_hash_variance',
+           'stats_protectionConnectivity_oh_hash_0_avg': 'instruction_connectivity_oh_hash_avg',
+           'stats_protectionConnectivity_oh_hash_0_std': 'instruction_connectivity_oh_hash_std',
+           'stats_protectionConnectivity_oh_hash_0_variance': 'instruction_connectivity_oh_hash_variance',
 
-           'stats_protectionConnectivity_oh_assert_0_avg': 'function_connectivity_oh_assert_avg',
-           'stats_protectionConnectivity_oh_assert_0_std': 'function_connectivity_oh_assert_std',
-           'stats_protectionConnectivity_oh_assert_0_variance': 'function_connectivity_oh_assert_variance',
-           'stats_protectionConnectivity_oh_assert_1_avg': 'instruction_connectivity_oh_assert_avg',
-           'stats_protectionConnectivity_oh_assert_1_std': 'instruction_connectivity_oh_assert_std',
-           'stats_protectionConnectivity_oh_assert_1_variance': 'instruction_connectivity_oh_assert_variance',
+           'stats_protectionConnectivity_oh_assert_1_avg': 'function_connectivity_oh_assert_avg',
+           'stats_protectionConnectivity_oh_assert_1_std': 'function_connectivity_oh_assert_std',
+           'stats_protectionConnectivity_oh_assert_1_variance': 'function_connectivity_oh_assert_variance',
+           'stats_protectionConnectivity_oh_assert_0_avg': 'instruction_connectivity_oh_assert_avg',
+           'stats_protectionConnectivity_oh_assert_0_std': 'instruction_connectivity_oh_assert_std',
+           'stats_protectionConnectivity_oh_assert_0_variance': 'instruction_connectivity_oh_assert_variance',
 
-           'stats_protectionConnectivity_sroh_hash_0_avg': 'function_connectivity_sroh_hash_avg',
-           'stats_protectionConnectivity_sroh_hash_0_std': 'function_connectivity_sroh_hash_std',
-           'stats_protectionConnectivity_sroh_hash_0_variance': 'function_connectivity_sroh_hash_variance',
-           'stats_protectionConnectivity_sroh_hash_1_avg': 'instruction_connectivity_sroh_hash_avg',
-           'stats_protectionConnectivity_sroh_hash_1_std': 'instruction_connectivity_sroh_hash_std',
-           'stats_protectionConnectivity_sroh_hash_1_variance': 'instruction_connectivity_sroh_hash_variance',
+           'stats_protectionConnectivity_sroh_hash_1_avg': 'function_connectivity_sroh_hash_avg',
+           'stats_protectionConnectivity_sroh_hash_1_std': 'function_connectivity_sroh_hash_std',
+           'stats_protectionConnectivity_sroh_hash_1_variance': 'function_connectivity_sroh_hash_variance',
+           'stats_protectionConnectivity_sroh_hash_0_avg': 'instruction_connectivity_sroh_hash_avg',
+           'stats_protectionConnectivity_sroh_hash_0_std': 'instruction_connectivity_sroh_hash_std',
+           'stats_protectionConnectivity_sroh_hash_0_variance': 'instruction_connectivity_sroh_hash_variance',
 
-           'stats_protectionConnectivity_sroh_assert_0_avg': 'function_connectivity_sroh_assert_avg',
-           'stats_protectionConnectivity_sroh_assert_0_std': 'function_connectivity_sroh_assert_std',
-           'stats_protectionConnectivity_sroh_assert_0_variance': 'function_connectivity_sroh_assert_variance',
-           'stats_protectionConnectivity_sroh_assert_1_avg': 'instruction_connectivity_sroh_assert_avg',
-           'stats_protectionConnectivity_sroh_assert_1_std': 'instruction_connectivity_sroh_assert_std',
-           'stats_protectionConnectivity_sroh_assert_1_variance': 'instruction_connectivity_sroh_assert_variance',
+           'stats_protectionConnectivity_sroh_assert_1_avg': 'function_connectivity_sroh_assert_avg',
+           'stats_protectionConnectivity_sroh_assert_1_std': 'function_connectivity_sroh_assert_std',
+           'stats_protectionConnectivity_sroh_assert_1_variance': 'function_connectivity_sroh_assert_variance',
+           'stats_protectionConnectivity_sroh_assert_0_avg': 'instruction_connectivity_sroh_assert_avg',
+           'stats_protectionConnectivity_sroh_assert_0_std': 'instruction_connectivity_sroh_assert_std',
+           'stats_protectionConnectivity_sroh_assert_0_variance': 'instruction_connectivity_sroh_assert_variance',
 
-           'stats_protectionConnectivity_sc_0_avg': 'function_connectivity_sc_avg',
-           'stats_protectionConnectivity_sc_0_std': 'function_connectivity_sc_std',
-           'stats_protectionConnectivity_sc_0_variance': 'function_connectivity_sc_variance',
-           'stats_protectionConnectivity_sc_1_avg': 'instruction_connectivity_sc_avg',
-           'stats_protectionConnectivity_sc_1_std': 'instruction_connectivity_sc_std',
-           'stats_protectionConnectivity_sc_1_variance': 'instruction_connectivity_sc_variance',
+           'stats_protectionConnectivity_sc_1_avg': 'function_connectivity_sc_avg',
+           'stats_protectionConnectivity_sc_1_std': 'function_connectivity_sc_std',
+           'stats_protectionConnectivity_sc_1_variance': 'function_connectivity_sc_variance',
+           'stats_protectionConnectivity_sc_0_avg': 'instruction_connectivity_sc_avg',
+           'stats_protectionConnectivity_sc_0_std': 'instruction_connectivity_sc_std',
+           'stats_protectionConnectivity_sc_0_variance': 'instruction_connectivity_sc_variance',
 
-           'stats_protectionConnectivity_cfi_0_avg': 'function_connectivity_cfi_avg',
-           'stats_protectionConnectivity_cfi_0_std': 'function_connectivity_cfi_std',
-           'stats_protectionConnectivity_cfi_0_variance': 'function_connectivity_cfi_variance',
-           'stats_protectionConnectivity_cfi_1_avg': 'instruction_connectivity_cfi_avg',
-           'stats_protectionConnectivity_cfi_1_std': 'instruction_connectivity_cfi_std',
-           'stats_protectionConnectivity_cfi_1_variance': 'instruction_connectivity_cfi_variance',
+           'stats_protectionConnectivity_cfi_1_avg': 'function_connectivity_cfi_avg',
+           'stats_protectionConnectivity_cfi_1_std': 'function_connectivity_cfi_std',
+           'stats_protectionConnectivity_cfi_1_variance': 'function_connectivity_cfi_variance',
+           'stats_protectionConnectivity_cfi_0_avg': 'instruction_connectivity_cfi_avg',
+           'stats_protectionConnectivity_cfi_0_std': 'instruction_connectivity_cfi_std',
+           'stats_protectionConnectivity_cfi_0_variance': 'instruction_connectivity_cfi_variance',
 
-           'stats_protectionConnectivity_cm_0_avg': 'function_connectivity_cm_avg',
-           'stats_protectionConnectivity_cm_0_std': 'function_connectivity_cm_std',
-           'stats_protectionConnectivity_cm_0_variance': 'function_connectivity_cm_variance',
-           'stats_protectionConnectivity_cm_1_avg': 'instruction_connectivity_cm_avg',
-           'stats_protectionConnectivity_cm_1_std': 'instruction_connectivity_cm_std',
-           'stats_protectionConnectivity_cm_1_variance': 'instruction_connectivity_cm_variance',
+           'stats_protectionConnectivity_cm_1_avg': 'function_connectivity_cm_avg',
+           'stats_protectionConnectivity_cm_1_std': 'function_connectivity_cm_std',
+           'stats_protectionConnectivity_cm_1_variance': 'function_connectivity_cm_variance',
+           'stats_protectionConnectivity_cm_0_avg': 'instruction_connectivity_cm_avg',
+           'stats_protectionConnectivity_cm_0_std': 'instruction_connectivity_cm_std',
+           'stats_protectionConnectivity_cm_0_variance': 'instruction_connectivity_cm_variance',
            }
 
 df.rename(columns=columns, inplace=True)
@@ -242,7 +242,7 @@ df = df.drop(columns=['drop'])
 df.to_csv("/tmp/tmp_data.pandas", sep=',', encoding='utf-8', index=False)
 
 
-# In[ ]:
+# In[14]:
 
 
 df = pd.read_csv("/tmp/tmp_data.pandas", sep=',', encoding='utf-8')
@@ -251,13 +251,13 @@ df = df.fillna(0)
 df = df.drop(columns=['combination'])
 
 
-# In[ ]:
+# In[15]:
 
 
 grouped = df.groupby([df['program'], df['coverage'], df['attempt']])
 
 
-# In[ ]:
+# In[16]:
 
 
 target_cols = ['conflicts', 'cycles', 'vertices', 'edges', 'patch_time', 'total_time', 'manifests',
@@ -311,7 +311,7 @@ result = result.sort_values(['program', 'coverage'])
 df = result.round(2)
 
 
-# In[ ]:
+# In[17]:
 
 
 df = df.fillna(0)
@@ -319,7 +319,7 @@ df.columns = df.columns.map('_'.join)
 df = df.reset_index()
 
 
-# In[ ]:
+# In[18]:
 
 
 for attempt in df['attempt'].unique():
@@ -328,8 +328,14 @@ for attempt in df['attempt'].unique():
         cdf.to_csv(os.path.join(FOLDER, "time-{}-{}.csv".format(attempt, coverage)), index=False)
 
 
-# In[ ]:
+# In[19]:
 
 
 df.to_csv(os.path.join(FOLDER, "time.csv"), index=False)
+
+
+# In[ ]:
+
+
+
 
