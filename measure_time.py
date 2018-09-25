@@ -51,7 +51,7 @@ def process_files(directory):
     return all_df
 
 
-# In[11]:
+# In[4]:
 
 
 def grab_results(result_directory):
@@ -110,14 +110,14 @@ def grab_results(result_directory):
     return {'total_time': 0, 'patch_time': 0, 'pass_times': {}}
 
 
-# In[12]:
+# In[5]:
 
 
 def replace_name(p):
     return p.replace('.bc', '').         replace('.x', '').         replace('_testapp', '').         replace('_game', '').         replace('_large', '-l').         replace('_small', '-s').         replace('raw', '').         replace('search', 'srch').         replace('sort', 'srt').         replace('basicmath', 'bm').         replace('dijkstra', 'dkstra')
 
 
-# In[13]:
+# In[6]:
 
 
 def process_results(df):
@@ -125,7 +125,7 @@ def process_results(df):
     return grouped.agg([np.median, np.mean, np.std])
 
 
-# In[14]:
+# In[10]:
 
 
 df = process_files("/home/sip/eval/binaries")
@@ -138,7 +138,7 @@ df = df[['program', 'attempt', 'coverage', 'actualManifests', 'proposedManifests
 df = process_results(df).sort_values(['program', 'coverage'])
 
 
-# In[15]:
+# In[8]:
 
 
 df = df.fillna(0)
@@ -159,6 +159,12 @@ for attempt in df['attempt'].unique():
 
 
 df.to_csv(os.path.join("/home/sip/eval/binaries", "time.csv"), index=False)
+
+
+# In[1]:
+
+
+
 
 
 # In[ ]:

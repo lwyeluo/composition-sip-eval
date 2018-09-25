@@ -137,8 +137,8 @@ do
                 cmd="${cmd} -load ${USR_LIB_DIR}/libSCPass.so"
                 cmd="${cmd} -load ${OH_LIB}/liboblivious-hashing.so"
                 cmd="${cmd} -load ${INPUT_DEP_PATH}/libTransforms.so"
-                cmd="${cmd} -load ${CFI_PATH}/cmake-build-debug/libControlFlowIntegrity.so"
-                cmd="${cmd} -load ${CMM_PATH}/cmake-build-debug/libCodeMobilityMock.so"
+#                cmd="${cmd} -load ${CFI_PATH}/cmake-build-debug/libControlFlowIntegrity.so"
+#                cmd="${cmd} -load ${CMM_PATH}/cmake-build-debug/libCodeMobilityMock.so"
                 # General flags
                 cmd="${cmd} -strip-debug"
                 cmd="${cmd} -unreachableblockelim"
@@ -162,20 +162,20 @@ do
                 cmd="${cmd} -exclude-main-unreachables"
                 cmd="${cmd} -main-reach-cached"
                 # CFI flags
-                cmd="${cmd} -cfi-template ${CFI_PATH}/stack_analysis/StackAnalysis.c"
-                cmd="${cmd} -cfi-outputdir ${output_dir}"
+#                cmd="${cmd} -cfi-template ${CFI_PATH}/stack_analysis/StackAnalysis.c"
+#                cmd="${cmd} -cfi-outputdir ${output_dir}"
                 # CF flags
                 cmd="${cmd} -cf-strategy=${STRATEGIES[${i}]}"
                 cmd="${cmd} -cf-stats=${output_dir}/composition.stats"
                 cmd="${cmd} -cf-patchinfo=${output_dir}/cf-patchinfo.json"
                 # PASS ORDER
                 cmd="${cmd} -sc"
-                cmd="${cmd} -control-flow-integrity"
-                cmd="${cmd} -code-mobility"
+#                cmd="${cmd} -control-flow-integrity"
+#                cmd="${cmd} -code-mobility"
                 cmd="${cmd} -oh-insert"
                 cmd="${cmd} -short-range-oh"
                 cmd="${cmd} -constraint-protection"
-	        cmd="${cmd} -time-passes"
+		        cmd="${cmd} -time-passes"
                 # End of command
                 ${cmd} |& tee "${output_dir}/transform.console"
 
@@ -194,8 +194,8 @@ do
                 g++ -no-pie -fPIC ${OH_PATH}/assertions/response_broken.cpp -c -o "${output_dir}/oh_rtlib.o"
                 LIB_FILES+=( "${output_dir}/oh_rtlib.o" )
 
-                gcc -no-pie -fPIC -g -rdynamic -c "${output_dir}/NewStackAnalysis.c" -o "${output_dir}/cfi_rtlib.o"
-                LIB_FILES+=( "${output_dir}/cfi_rtlib.o" )
+#                gcc -no-pie -fPIC -g -rdynamic -c "${output_dir}/NewStackAnalysis.c" -o "${output_dir}/cfi_rtlib.o"
+#                LIB_FILES+=( "${output_dir}/cfi_rtlib.o" )
 
                 gcc -no-pie -fPIC -g -rdynamic -c "${SC_PATH}/rtlib.c" -o "${output_dir}/sc_rtlib.o"
                 LIB_FILES+=( "${output_dir}/sc_rtlib.o" )
