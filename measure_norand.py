@@ -14,7 +14,7 @@ import re
 from flatten_json import flatten_json
 import itertools
 
-FOLDER = "/home/sip/eval/binaries_norand_ohsc"
+FOLDER = "/home/sip/eval/binaries"
 
 
 # In[3]:
@@ -89,7 +89,8 @@ def grab_results(result_directory):
         with open(patch_time_txt, 'r') as f:
             data = f.read()
             m = re.match(patchTimeRegex, data)
-            patch_time = m.group(1)
+            if m and m.group(1):
+                patch_time = m.group(1)
 
     passes = {}
     total_time = 0

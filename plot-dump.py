@@ -33,7 +33,8 @@ def prepare_xtick_labels(coverage_labels, programs, E, N, M):
     i = 0
     for p in programs:
         # 2 is index of 25 in the labels, -1 because index starts from 0
-        coverage_labels[i + 2] = p
+        coverage_labels[i] = p
+#        coverage_labels[i + 2] = p
         # print 'i:{},M:{}'.format(i, M)
         i += M + E
     return coverage_labels

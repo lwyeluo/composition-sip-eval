@@ -24,9 +24,10 @@ link_libraries=/home/sip/eval/link-libraries/
 args_path=/home/sip/eval/cmdline-args
 blockfrequency=/home/sip/eval/blockfrequency
 #REPEAT=( 0 )
-REPEAT=( 0 1 )
-#REPEAT=( 1 )
-STRATEGIES=('random' 'avoidance' )
+#REPEAT=( 0 1 2 )
+#REPEAT=( 0 1 )
+REPEAT=( 1 )
+STRATEGIES=('random' 'avoidance' 'weight' )
 
 mkdir -p binaries
 
@@ -137,8 +138,8 @@ do
                 cmd="${cmd} -load ${USR_LIB_DIR}/libSCPass.so"
                 cmd="${cmd} -load ${OH_LIB}/liboblivious-hashing.so"
                 cmd="${cmd} -load ${INPUT_DEP_PATH}/libTransforms.so"
-                cmd="${cmd} -load ${CFI_PATH}/cmake-build-debug/libControlFlowIntegrity.so"
-                cmd="${cmd} -load ${CMM_PATH}/cmake-build-debug/libCodeMobilityMock.so"
+                cmd="${cmd} -load ${CFI_PATH}/build/libControlFlowIntegrity.so"
+#                cmd="${cmd} -load ${CMM_PATH}/cmake-build-debug/libCodeMobilityMock.so"
                 # General flags
                 cmd="${cmd} -strip-debug"
                 cmd="${cmd} -unreachableblockelim"
@@ -171,12 +172,14 @@ do
                 # PASS ORDER
                 cmd="${cmd} -sc"
                 cmd="${cmd} -control-flow-integrity"
-                cmd="${cmd} -code-mobility"
+#                cmd="${cmd} -code-mobility"
                 cmd="${cmd} -oh-insert"
                 cmd="${cmd} -short-range-oh"
-                cmd="${cmd} -constraint-protection"
+                cmd="${cmd} -composition-framework"
 	        cmd="${cmd} -time-passes"
                 # End of command
+#		gdb --args ${cmd}
+#		heaptrack ${cmd}
                 ${cmd} |& tee "${output_dir}/transform.console"
 
 

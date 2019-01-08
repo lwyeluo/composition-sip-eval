@@ -99,7 +99,7 @@ def grab_results(result_directory):
                     cf_time += value
 
             passes["cf"] = float(cf_time)
-            passes["protections_total"] = float(passes["oh"] + passes["sc"] + passes["cfi"] + passes["cm"])
+            passes["protections_total"] = float(passes["oh"] + passes["sc"] + passes["cfi"])# + passes["cm"])
     composition_stats = os.path.join(result_directory, "composition.stats")
     if os.path.exists(composition_stats):
         data = json.load(open(composition_stats))
@@ -133,7 +133,7 @@ df = df.fillna(0)
 df = df.drop(columns=['combination'])
 df = df[['program', 'attempt', 'coverage', 'actualManifests', 'proposedManifests', 'cycles', 'conflicts',
          'timeConflictDetection', 'timeConflictResolving', 'timeGraphConstruction', 'total_time',
-         'pass_times.protections_total', 'patch_time', 'pass_times.cf', 'pass_times.cm', 'pass_times.cfi',
+         'pass_times.protections_total', 'patch_time', 'pass_times.cf', 'pass_times.cfi', #'pass_times.cm',
          'pass_times.sc', 'pass_times.oh']]
 df = process_results(df).sort_values(['program', 'coverage'])
 

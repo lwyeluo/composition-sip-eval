@@ -6,8 +6,8 @@ FILES=/home/sip/eval/coverage/*.bc
 coverage_dir=/home/sip/eval/coverage
 CSVPATH=/home/sip/eval/combination
 num_combination=20
-func_coverage="0 10 25 50 100"
-
+#func_coverage="0 10 25 50 100"
+func_coverage="0 100"
 for f in ${FILES}
 do
 	bitcode=${f}
