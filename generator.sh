@@ -2,16 +2,10 @@
 set -euo pipefail
 source env.sh
 
-SC_PATH=/home/dennis/Desktop/self-checksumming
-CF_PATH=/home/dennis/Desktop/composition-framework
-CFI_PATH=/home/dennis/Desktop/sip-control-flow-integrity
-CMM_PATH=/home/dennis/Desktop/code-mobility-mock
-OH_PATH=/home/dennis/Desktop/sip-oblivious-hashing
-
 USR_LIB_DIR=/usr/local/lib
 INPUT_DEP_PATH=${USR_LIB_DIR}
 DG_PATH=${USR_LIB_DIR}
-OH_LIB=${OH_PATH}/cmake-build-debug
+OH_LIB=${OH_PATH}/$BUILD_DIR
 bc_files=/home/sip/eval/coverage/*.bc
 combination_path=/home/sip/eval/combination/
 binary_path=/home/sip/eval/binaries
@@ -134,8 +128,8 @@ do
                 cmd="${cmd} -load ${USR_LIB_DIR}/libSCPass.so"
                 cmd="${cmd} -load ${OH_LIB}/liboblivious-hashing.so"
                 cmd="${cmd} -load ${INPUT_DEP_PATH}/libTransforms.so"
-                cmd="${cmd} -load ${CFI_PATH}/build/libControlFlowIntegrity.so"
-#                cmd="${cmd} -load ${CMM_PATH}/cmake-build-debug/libCodeMobilityMock.so"
+                cmd="${cmd} -load ${CFI_PATH}/$BUILD_DIR/libControlFlowIntegrity.so"
+#                cmd="${cmd} -load ${CMM_PATH}/$BUILD_DIR/libCodeMobilityMock.so"
                 # General flags
                 cmd="${cmd} -strip-debug"
                 cmd="${cmd} -unreachableblockelim"
