@@ -4,6 +4,8 @@ set -xeou pipefail
 ./coverage-improver.sh $@
 #extract filter fils (i.e. combinations) from the list of available function names
 ./combinator.sh $@
+#create performance data with block frequencies
+./blockfrequency.sh $@
 #generat prottected binaries
 ./generator.sh $@
 if [ $? -eq 0 ]; then
