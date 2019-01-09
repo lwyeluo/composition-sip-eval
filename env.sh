@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+dotenv () {
+  set -a
+  [ -f .env ] && . .env
+  set +a
+}
+dotenv

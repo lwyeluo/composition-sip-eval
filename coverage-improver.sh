@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
+source env.sh
 
-OPT=opt
 USR_LIB_DIR=/usr/local/lib
 FILES=/home/sip/eval/local_dataset/*.bc
 COVERAGEPATH=/home/sip/eval/coverage/
@@ -10,14 +10,14 @@ do
 	bitcode=$f
 	echo $f
 	filename=${f##*/}
-    output=$COVERAGEPATH$filename
+    	output=$COVERAGEPATH$filename
 
-    if [ $# -eq 1 ]; then
-         if [ -f "$output" ]; then
-             echo "skipping $output generation, it already exists"
-             continue
-         fi
-    fi
+    	if [ $# -eq 1 ]; then
+        	if [ -f "$output" ]; then
+        		echo "skipping $output generation, it already exists"
+        		continue
+         	fi
+    	fi
 
 	libconfig=$configs/$filename
 	echo "$libconfig"
@@ -47,7 +47,6 @@ do
 		echo 'OK Transform'
 	else
 		echo 'FAIL Transform'
-		echo "${OPT} -load $USR_LIB_DIR/libInputDependency.so -load $USR_LIB_DIR/libTransforms.so $bitcode -clone-functions -extract-functions -o $output"
 		exit
 	fi
 done

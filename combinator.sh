@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
+source env.sh
 
-OPT=opt
 EVAL_LIB=/home/sip/eval/passes/build/lib
 FILES=/home/sip/eval/coverage/*.bc
 coverage_dir=/home/sip/eval/coverage

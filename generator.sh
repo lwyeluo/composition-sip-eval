@@ -1,10 +1,6 @@
-
 #!/usr/bin/env bash
 set -euo pipefail
-
-CLANG=clang-6.0
-OPT=opt
-LLC=llc
+source env.sh
 
 SC_PATH=/home/dennis/Desktop/self-checksumming
 CF_PATH=/home/dennis/Desktop/composition-framework
