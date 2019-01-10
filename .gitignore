@@ -42,3 +42,6 @@ graph.txt
 faulty_binary.txt
 passes/build/
 .idea/
+output_small.enc
+blockfrequency/
+
