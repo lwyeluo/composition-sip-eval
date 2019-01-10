@@ -45,3 +45,7 @@ passes/build/
 output_small.enc
 blockfrequency/
 
+output_small.smoothing.pgm
+
+small_output.au
+
