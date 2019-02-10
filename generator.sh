@@ -140,6 +140,7 @@ do
                 cmd="${cmd} -pgo-instr-use"
                 cmd="${cmd} -pgo-test-profile-file=${blockfrequency}/${filename}/${filename}.prof"
                 cmd="${cmd} -profile-sample-accurate"
+		cmd="${cmd} -debug-pass=Structure"
                 # SC flags
                 cmd="${cmd} -use-other-functions"
                 cmd="${cmd} -connectivity=1"
@@ -170,6 +171,7 @@ do
                 # End of command
 #		gdb --args ${cmd}
 #		heaptrack ${cmd}
+#		perf record --call-graph dwarf ${cmd}
                 ${cmd} |& tee "${output_dir}/transform.console"
 
 
