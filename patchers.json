@@ -3,7 +3,7 @@
     "sc": [
       [
         "python",
-        "/home/dennis/Desktop/self-checksumming/patcher/dump_pipe.py",
+        "/home/dennis/Desktop/sip/self-checksumming/patcher/dump_pipe.py",
         "{BINARY}",
         "{OUTPUT}/sc_guide.txt",
         "patch_guide",
@@ -13,7 +13,7 @@
     "oh": [
       [
         "python",
-        "/home/dennis/Desktop/sip-oblivious-hashing/patcher/patchAsserts.py",
+        "/home/dennis/Desktop/sip/sip-oblivious-hashing/patcher/patchAsserts.py",
         "-b",
         "{BINARY}",
         "-n",
@@ -21,7 +21,7 @@
         "-s",
         "{OUTPUT}/oh.stats",
         "-p",
-        "/home/dennis/Desktop/sip-oblivious-hashing/assertions/gdb_script_for_do_assert.txt",
+        "/home/dennis/Desktop/sip/sip-oblivious-hashing/assertions/gdb_script_for_do_assert.txt",
         "-m",
         "{OUTPUT}/oh_guide.txt",
         "-g",
@@ -47,7 +47,7 @@
     ],
     [
       "python",
-      "/home/dennis/Desktop/sip-oblivious-hashing/patcher/patchAsserts.py",
+      "/home/dennis/Desktop/sip/sip-oblivious-hashing/patcher/patchAsserts.py",
       "-b",
       "{BINARY}",
       "-n",
@@ -55,7 +55,7 @@
       "-s",
       "{OUTPUT}/oh.stats",
       "-p",
-      "/home/dennis/Desktop/sip-oblivious-hashing/assertions/gdb_script_for_do_assert.txt",
+      "/home/dennis/Desktop/sip/sip-oblivious-hashing/assertions/gdb_script_for_do_assert.txt",
       "-m",
       "{OUTPUT}/oh_guide.txt",
       "-f",

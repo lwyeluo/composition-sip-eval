@@ -10,8 +10,8 @@ import argparse
 from shutil import copyfile
 from benchexec.runexecutor import RunExecutor
 
-REPEAT_NUMBER = 5
-BASE_REPEAT_NUMBER = 5
+REPEAT_NUMBER = 2
+BASE_REPEAT_NUMBER = 2
 RUNS_JSON = "runs.json"
 CMDLINE_ARGS = "cmdline-args"
 EXIT_CODES = {
