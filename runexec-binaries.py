@@ -19,7 +19,7 @@ EXIT_CODES = {
     'bf.x.bc': 256,
 }
 FAULTY_BINARY = "faulty_binary.txt"
-LD_PRELOAD = ['/home/dennis/Desktop/self-checksumming/hook/build/libminm.so']
+LD_PRELOAD = ['/home/sip/self-checksumming/hook/build/libminm.so']
 
 
 def get_immediate_subdirectories(d):

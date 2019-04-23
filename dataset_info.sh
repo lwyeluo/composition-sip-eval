@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 set -xeuo pipefail
 
-CLANG=clang-6.0
+CLANG=clang
 OPT=opt
 LLC=llc
 LLVM_LINK=llvm-link
 INPUT_DEP_PATH=/usr/local/lib/
 
-SC_PATH=/home/dennis/Desktop/self-checksumming
-CF_PATH=/home/dennis/Desktop/composition-framework
-CFI_PATH=/home/dennis/Desktop/sip-control-flow-integrity
-CMM_PATH=/home/dennis/Desktop/code-mobility-mock
-OH_PATH=/home/dennis/Desktop/sip-oblivious-hashing
+SC_PATH=/home/sip/self-checksumming
+CF_PATH=/home/sip/composition-framework
+CFI_PATH=/home/sip/sip-control-flow-integrity
+CMM_PATH=/home/sip/code-mobility-mock
+OH_PATH=/home/sip/sip-oblivious-hashing
 
 USR_LIB_DIR=/usr/local/lib
 INPUT_DEP_PATH=${USR_LIB_DIR}

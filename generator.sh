@@ -128,7 +128,7 @@ do
                 cmd="${cmd} -load ${USR_LIB_DIR}/libSCPass.so"
                 cmd="${cmd} -load ${OH_LIB}/liboblivious-hashing.so"
                 cmd="${cmd} -load ${INPUT_DEP_PATH}/libTransforms.so"
-                cmd="${cmd} -load ${CFI_PATH}/$BUILD_DIR/libControlFlowIntegrity.so"
+                #cmd="${cmd} -load ${CFI_PATH}/$BUILD_DIR/libControlFlowIntegrity.so"
 #                cmd="${cmd} -load ${CMM_PATH}/$BUILD_DIR/libCodeMobilityMock.so"
                 # General flags
                 cmd="${cmd} -strip-debug"
@@ -148,21 +148,21 @@ do
                 cmd="${cmd} -dump-sc-stat=${output_dir}/sc.stats"
                 cmd="${cmd} -filter-file=${coverage}"
                 # OH flags
-                cmd="${cmd} -protect-data-dep-loops"
+                #cmd="${cmd} -protect-data-dep-loops"
                 cmd="${cmd} -num-hash 1"
                 cmd="${cmd} -dump-oh-stat=${output_dir}/oh.stats"
                 cmd="${cmd} -exclude-main-unreachables"
                 cmd="${cmd} -main-reach-cached"
                 # CFI flags
-                cmd="${cmd} -cfi-template ${CFI_PATH}/stack_analysis/StackAnalysis.c"
-                cmd="${cmd} -cfi-outputdir ${output_dir}"
+                #cmd="${cmd} -cfi-template ${CFI_PATH}/stack_analysis/StackAnalysis.c"
+                #cmd="${cmd} -cfi-outputdir ${output_dir}"
                 # CF flags
                 cmd="${cmd} -cf-strategy=${STRATEGIES[${i}]}"
                 cmd="${cmd} -cf-stats=${output_dir}/composition.stats"
                 cmd="${cmd} -cf-patchinfo=${output_dir}/cf-patchinfo.json"
                 # PASS ORDER
                 cmd="${cmd} -sc"
-                cmd="${cmd} -control-flow-integrity"
+                #cmd="${cmd} -control-flow-integrity"
 #                cmd="${cmd} -code-mobility"
                 cmd="${cmd} -oh-insert"
                 cmd="${cmd} -short-range-oh"
@@ -189,14 +189,22 @@ do
                 g++ -no-pie -fPIC ${OH_PATH}/assertions/response_broken.cpp -c -o "${output_dir}/oh_rtlib.o"
                 LIB_FILES+=( "${output_dir}/oh_rtlib.o" )
 
-                gcc -no-pie -fPIC -g -rdynamic -c "${output_dir}/NewStackAnalysis.c" -o "${output_dir}/cfi_rtlib.o"
-                LIB_FILES+=( "${output_dir}/cfi_rtlib.o" )
+                #gcc -no-pie -fPIC -g -rdynamic -c "${output_dir}/NewStackAnalysis.c" -o "${output_dir}/cfi_rtlib.o"
+                #LIB_FILES+=( "${output_dir}/cfi_rtlib.o" )
 
                 gcc -no-pie -fPIC -g -rdynamic -c "${SC_PATH}/rtlib.c" -o "${output_dir}/sc_rtlib.o"
                 LIB_FILES+=( "${output_dir}/sc_rtlib.o" )
 
                 g++ -no-pie -fPIC -std=c++11 -g -rdynamic -shared -Wl,-soname,librtlib.so \
                     -o "${output_dir}/librtlib.so" ${LIB_FILES[@]} -lssl -lcrypto
+
+                if [ $? -eq 0 ]; then
+                    echo 'OK Link'
+                else
+                    echo !!
+                    echo 'FAIL Link'
+                    exit
+                fi
 
 
                 echo 'Post patching binary after hash calls'
@@ -232,6 +240,8 @@ do
                         mv ${output_dir}/${filename}"tmp" ${output_dir}/${filename}
                     fi
                     chmod +x ${output_dir}/${filename}
+		else 
+		    echo 'Patcher Failed'
                 fi
 			done
 		done
