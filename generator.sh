@@ -159,6 +159,9 @@ do
                 # CF flags
                 cmd="${cmd} -cf-strategy=${STRATEGIES[${i}]}"
                 cmd="${cmd} -cf-stats=${output_dir}/composition.stats"
+		cmd="${cmd} -cf-ilp-prob=${output_dir}/problem.txt"
+		cmd="${cmd} -cf-ilp-sol=${output_dir}/solution.txt"
+		cmd="${cmd} -cf-ilp-sol-readable=${output_dir}/solution_readable.txt"
                 cmd="${cmd} -cf-patchinfo=${output_dir}/cf-patchinfo.json"
                 # PASS ORDER
                 cmd="${cmd} -sc"
@@ -231,7 +234,7 @@ do
                 #rm ${output_dir}/out.s ||:
 
                 echo 'Starting patcher, this will wait for input when nothing is provided'
-		        echo python "${CF_PATH}/hook/patcher.py" "${output_dir}/${filename}" -m "${output_dir}/cf-patchinfo.json" -p "patchers.json" -o "${output_dir}" --args-path "${cmd_args}" &> "${output_dir}/patcher.console"
+	        echo python "${CF_PATH}/hook/patcher.py" "${output_dir}/${filename}" -m "${output_dir}/cf-patchinfo.json" -p "patchers.json" -o "${output_dir}" --args-path "${cmd_args}" &> "${output_dir}/patcher.console"
                 /usr/bin/time -f "totaltime: %e %U %S" -o "${output_dir}/patchTime.txt" python "${CF_PATH}/hook/patcher.py" "${output_dir}/${filename}" -m "${output_dir}/cf-patchinfo.json" -p "patchers.json" -o "${output_dir}" --args-path "${cmd_args}" &> "${output_dir}/patcher.console"
 
                 if [ $? -eq 0 ]; then
