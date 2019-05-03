@@ -17,14 +17,14 @@ blockfrequency=/home/sip/eval/blockfrequency
 #REPEAT=( 0 1 2 )
 #REPEAT=( 0 1 )
 REPEAT=( 1 )
-STRATEGIES=('random' ) #either of 'ilp' or 'random' 
+STRATEGIES=('ilp' ) #either of 'ilp' or 'random' 
 
 mkdir -p binaries
 
 for bc in ${bc_files}
 do
 	bitcode=${bc}
-	echo ${bc}
+	echo "Starting with ${bc}"
 	filename=${bc##*/}
 	libconfig=${config_path}${filename}
 	cmd_args=""
@@ -163,7 +163,12 @@ do
 		cmd="${cmd} -cf-ilp-sol=${output_dir}/solution.txt"
 		cmd="${cmd} -cf-ilp-sol-readable=${output_dir}/solution_readable.txt"
                 cmd="${cmd} -cf-patchinfo=${output_dir}/cf-patchinfo.json"
-                cmd="${cmd} -cf-ilp-implicit-bound=20"
+                cmd="${cmd} -cf-ilp-implicit-bound=1211"
+                #cmd="${cmd} -cf-ilp-explicit-bound=50"
+                #cmd="${cmd} -cf-ilp-overhead-bound=353"
+                #cmd="${cmd} -cf-ilp-connectivity-bound=4"
+                #cmd="${cmd} -cf-ilp-blockconnectivity-bound=6"
+                cmd="${cmd} -cf-ilp-obj=explicit"
                 # PASS ORDER
                 cmd="${cmd} -sc"
                 cmd="${cmd} -control-flow-integrity"
@@ -177,7 +182,7 @@ do
 #		heaptrack ${cmd}
 #		perf record --call-graph dwarf ${cmd}
                 ${cmd} |& tee "${output_dir}/transform.console"
-
+                echo "EAT ME:\n$cmd"
 
                 echo ${output_dir}
                 if [ $? -eq 0 ]; then
@@ -250,5 +255,6 @@ do
 			done
 		done
 	done
+echo "Finished $bitcode"
 done
 echo 'Generator is done!'
