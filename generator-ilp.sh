@@ -2,16 +2,24 @@
 set -euo pipefail
 source env.sh
 
+objective='overhead'
+
+
+
+
+
+
 USR_LIB_DIR=/usr/local/lib
 INPUT_DEP_PATH=${USR_LIB_DIR}
 DG_PATH=${USR_LIB_DIR}
 OH_LIB=${OH_PATH}/$BUILD_DIR
 bc_files=/home/sip/eval/coverage/*.bc
 combination_path=/home/sip/eval/combination/
-binary_path=/home/sip/eval/binaries
+binary_path="/home/sip/eval/binaries-${objective}"
 config_path=/home/sip/eval/lib-config/
 link_libraries=/home/sip/eval/link-libraries/
 args_path=/home/sip/eval/cmdline-args
+constraints_path=/home/sip/eval/constraints
 blockfrequency=/home/sip/eval/blockfrequency
 #REPEAT=( 0 )
 #REPEAT=( 0 1 2 )
@@ -31,7 +39,11 @@ do
 	if [ -f "${args_path}/${filename}" ]; then
 		cmd_args="${args_path}/${filename}"
 	fi
-
+        constraints_args=""
+        if [ -f "${constraints_path}/${filename}" ]; then
+                constraints_args=$(<${constraints_path}/${filename})
+        fi
+        echo $constraints_args
 	combination_dir=${combination_path}${filename}/*
 
 	libraries=""
@@ -169,7 +181,8 @@ do
                 #cmd="${cmd} -cf-ilp-overhead-bound=353"
                 #cmd="${cmd} -cf-ilp-connectivity-bound=4"
                 #cmd="${cmd} -cf-ilp-blockconnectivity-bound=6"
-                cmd="${cmd} -cf-ilp-obj=manifest"
+                cmd="${cmd} ${constraints_args}"
+                cmd="${cmd} -cf-ilp-obj=${objective}"
                 # PASS ORDER
                 cmd="${cmd} -sc"
                 cmd="${cmd} -control-flow-integrity"
