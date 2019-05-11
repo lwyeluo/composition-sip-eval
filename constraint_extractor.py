@@ -134,7 +134,8 @@ def dump_constraints(df):
     os.mkdir(dirName)
     for index,prog in df.iterrows():
         pp.pprint(prog)
-        constraint = "-cf-ilp-explicit-bound={0} -cf-ilp-implicit-bound={1} -cf-ilp-overhead-bound={2} ".format(int(prog['ilp_result.explicit']),int(prog['ilp_result.implicit']),prog['ilp_result.overhead'])
+        #constraint = "-cf-ilp-explicit-bound={0} -cf-ilp-implicit-bound={1} -cf-ilp-overhead-bound={2} ".format(int(prog['ilp_result.explicitMANIFEST']),int(prog['ilp_result.implicitMANIFEST']),prog['ilp_result.overheadMANIFEST'])
+        constraint = "-cf-ilp-explicit-bound={0} -cf-ilp-overhead-bound={1} ".format(int(prog['ilp_result.explicitMANIFEST']),prog['ilp_result.overheadMANIFEST'])
         fname = os.path.join(dirName,prog['program'])
         print(fname)
         f = open(fname, "w") 
@@ -145,7 +146,7 @@ def main():
     df = process_files("/home/sip/eval/binaries",Objective.MANIFEST)
     df = df.reset_index()
     df = df.drop(columns=['index'])
-    df = df.drop(columns=['Name'])
+#    df = df.drop(columns=['Name'])
     out = df.to_json(orient='records')
     dump_constraints(df)    
     with open('extracted-constraints.json', 'w') as f:

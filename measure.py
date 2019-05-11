@@ -10,7 +10,7 @@ import json
 import numpy as np
 import pandas as pd
 from pandas.io.json import json_normalize
-
+import argparse
 
 # In[33]:
 
@@ -75,29 +75,37 @@ def replace_name(p):
 
 
 # In[38]:
+def main():
+    parser = argparse.ArgumentParser(description='Run all generated binaries and measure performance overhead.')
+    parser.add_argument('dir', metavar='DIR', type=str, help='Directory of the binaries to run.')
+    args = parser.parse_args()
 
-
-df = process_files("/home/sip/eval/binaries")
-df = df.fillna(0)
-df = df.drop(columns=['combination'])
-df = process_results(df)
-df = df.sort_values(['program', 'coverage'])
-df.columns = df.columns.map('_'.join)
-df = df.reset_index()
-df = df.fillna(0)
+    binary_dir = os.path.abspath(args.dir)
+    if not os.path.isdir(os.path.abspath(args.dir)):
+        parser.print_help()
+        return
+    df = process_files(binary_dir)
+    df = df.fillna(0)
+    df = df.drop(columns=['combination'])
+    df = process_results(df)
+    df = df.sort_values(['program', 'coverage'])
+    df.columns = df.columns.map('_'.join)
+    df = df.reset_index()
+    df = df.fillna(0)
 
 
 # In[39]:
 
 
-for attempt in df['attempt'].unique():
-    adf = df[df['attempt'] == attempt]
-    adf.to_csv(os.path.join("/home/sip/eval/binaries", "measurements-{}.csv".format(attempt)), index=False)
-    adf.to_json(os.path.join("/home/sip/eval/binaries", "measurements-{}.json".format(attempt)), orient='records')
+    for attempt in df['attempt'].unique():
+        adf = df[df['attempt'] == attempt]
+        adf.to_csv(os.path.join(binary_dir, "measurements-{}.csv".format(attempt)), index=False)
+        adf.to_json(os.path.join(binary_dir, "measurements-{}.json".format(attempt)), orient='records')
 
 
 # In[ ]:
 
 
 
-
+if __name__ == "__main__":
+    main()
