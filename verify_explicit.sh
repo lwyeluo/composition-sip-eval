@@ -4,7 +4,7 @@ source env.sh
 
 bc_files=/home/sip/eval/coverage/*.bc
 combination_path=/home/sip/eval/combination/
-binary_path=/home/sip/eval/binaries
+binary_path=/home/sip/eval/binaries-explicit
 #REPEAT=( 0 )
 #REPEAT=( 0 1 2 )
 #REPEAT=( 0 1 )

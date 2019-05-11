@@ -4,7 +4,7 @@ source env.sh
 
 bc_files=/home/sip/eval/coverage/*.bc
 combination_path=/home/sip/eval/combination/
-binary_path=/home/sip/eval/binaries-implicit
+binary_path=/home/sip/eval/binaries
 #REPEAT=( 0 )
 #REPEAT=( 0 1 2 )
 #REPEAT=( 0 1 )
@@ -34,10 +34,11 @@ do
 				output_dir=${binary_path}/${filename}/${coverage_name}/${combination_file}/${i}
 
 				if [[ -d ${output_dir} ]]; then
-					[[ ! $(grep "Objective" ${output_dir}/solution.txt | awk '{print $3}') -eq $(jq .stats.numberOfDistinctImplicitlyProtectedInstructions ${output_dir}/composition.stats) ]] && echo "bad case"
+					[[ ! $(jq .actualManifests ${output_dir}/composition.stats) -gt 0 ]] && echo "bad manifest case";
+					[[ ! $(grep -m 1 "explicit" "${output_dir}/solution_readable.txt" | awk '{print $3}') -eq $(jq .stats.numberOfProtectedDistinctInstructions ${output_dir}/composition.stats) ]] && echo "bad explicit case";
+					[[ ! $(grep -m 1 "implicit" "${output_dir}/solution_readable.txt" | awk '{print $3}') -eq $(jq .stats.numberOfDistinctImplicitlyProtectedInstructions ${output_dir}/composition.stats) ]] && echo "bad implicit case";
 				fi
 			done
 		done
 	done
 done
-echo 'Generator is done!'
