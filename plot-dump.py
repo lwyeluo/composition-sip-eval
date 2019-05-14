@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from pprint import pprint
 import json
@@ -19,7 +21,7 @@ def read(file_path):
             overhead[program['coverage']]['cpu_stds'] = []
             overhead[program['coverage']]['programs'] = []
 
-        overhead[program['coverage']]['cpu_means'].append(program['cputime_mean'])
+        overhead[program['coverage']]['cpu_means'].append(program['cputime_median'])
         overhead[program['coverage']]['cpu_stds'].append(program['cputime_std'])
         overhead[program['coverage']]['programs'].append(program['program'])
 
@@ -128,7 +130,10 @@ def main():
                                                              np.std(overheads[coverage][means_dic_name]),
                                                              np.median(overheads[coverage][means_dic_name])))
         pprint(zip(programs, overheads[coverage][means_dic_name]))
-
+        pprint('SIZE:{0}'.format(len(overheads[coverage][means_dic_name])))
+        for nn in overheads[coverage][means_dic_name]:
+            pprint(nn)
+        #pprint (overheads[coverage][means_dic_name])
         columns = ind[i:len(ind) - 1:M + E]
 
         rects1 = ax.bar(columns, overheads[coverage][means_dic_name], width, color=ax_color, edgecolor='black',

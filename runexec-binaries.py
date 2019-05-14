@@ -10,8 +10,8 @@ import argparse
 from shutil import copyfile
 from benchexec.runexecutor import RunExecutor
 
-REPEAT_NUMBER = 2
-BASE_REPEAT_NUMBER = 2
+REPEAT_NUMBER = 50
+BASE_REPEAT_NUMBER = 200
 RUNS_JSON = "runs.json"
 CMDLINE_ARGS = "cmdline-args"
 EXIT_CODES = {
@@ -109,16 +109,19 @@ def measure_overhead(result_directory, program, repeat):
         print('Failed to run {} and thus no overhead results were captured'.format(program))
     return results
 
-
+REDO = False
+PROGRAMS = []
 def process_files(directory):
+    global REDO
     for program_dir in get_immediate_subdirectories(directory):
-        for coverage_dir in get_immediate_subdirectories(program_dir):
+        for coverage_dir in sorted(get_immediate_subdirectories(program_dir)):
             for combination_dir in get_immediate_subdirectories(coverage_dir):
                 for attempt_dir in get_immediate_subdirectories(combination_dir):
                     result_path = attempt_dir
-
+                    pname =os.path.basename(program_dir)
+                    repeat_program = any(pname in p for p in PROGRAMS)
                     # if processed file already exists, do not run the program again
-                    if os.path.exists(os.path.join(result_path, RUNS_JSON)):
+                    if not repeat_program and not REDO and os.path.exists(os.path.join(result_path, RUNS_JSON)):
                         continue
 
                     repeat = repeats_for_directory(coverage_dir)
@@ -128,13 +131,19 @@ def process_files(directory):
 def main():
     parser = argparse.ArgumentParser(description='Run all generated binaries and measure performance overhead.')
     parser.add_argument('dir', metavar='DIR', type=str, help='Directory of the binaries to run.')
+    parser.add_argument('-r', action='store_true',dest='repeat',required=False, help='Redo executions even if there is already results available in the path.')
+    parser.add_argument('-p', action='store',dest='programs',required=False, type=str, help='Redo executions for the given comma separated programs even if there is already results available in the path.')
     args = parser.parse_args()
 
     binary_dir = os.path.abspath(args.dir)
     if not os.path.isdir(os.path.abspath(args.dir)):
         parser.print_help()
         return
-
+    global REDO
+    global  PROGRAMS
+    REDO = args.repeat
+    if args.programs!= None:
+        PROGRAMS = args.programs.split(',')
     process_files(binary_dir)
 
 
