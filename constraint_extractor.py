@@ -37,7 +37,7 @@ def process_files(directory,objective):
         for coverage_dir in sorted(get_immediate_subdirectories(program_dir)):
             coverage = os.path.basename(coverage_dir)
             #no ilp results to extract from coverage 0
-            if int(coverage)!=100:
+            if int(coverage)==0:
                 continue
             for combination_dir in get_immediate_subdirectories(coverage_dir):
                 print(combination_dir)
@@ -147,7 +147,7 @@ def dump_constraints(df,obj):
         f.close() 
 
 def main():
-    df = process_files("/home/sip/eval/binaries",Objective.MANIFEST)
+    df = process_files("/home/sip/eval/binaries-acsac-manifest",Objective.MANIFEST)
     df = df.reset_index()
     df = df.drop(columns=['index'])
 #    df = df.drop(columns=['Name'])

@@ -88,16 +88,15 @@ do
 		do
 			combination_file=${coverage##*/}
                         constraints_file=$constraints_path/$filename/$coverage_name/$combination_file 
+			output_dir=${binary_path}/${filename}/${coverage_name}/${combination_file}
                         echo $constraints_file
                         constraints_args=""
                         if [ -f "${constraints_file}" ]; then
                           constraints_args=$(<${constraints_file})
                         fi  
+			echo $output_dir
                         echo $constraints_args
-                        continue
-                        exit 1
 
-			output_dir=${binary_path}/${filename}/${coverage_name}/${combination_file}
 
 			echo "Handling combination file $coverage"
 			echo "Protect $bc with function combination file $coverage"
