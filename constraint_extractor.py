@@ -49,7 +49,7 @@ def process_files(directory,objective):
 
                     ilp_results,state_results = grab_results(result_path,objective)
 
-                    df = json_normalize(data={'ilp_result':ilp_results,'stats_result':state_results})
+                    df = json_normalize(data={'coverage':int(coverage),'combination':int(combination),'ilp_result':ilp_results,'stats_result':state_results})
                     df.insert(0, 'program', program)
     #                print(df)
                     all_df = all_df.append(df, sort=False)
@@ -126,7 +126,7 @@ def replace_name(p):
 
 # In[38]:
 
-def dump_constraints(df):
+def dump_constraints(df,obj):
     dirName = 'constraints'
     pp = pprint.PrettyPrinter(indent=4)
     if os.path.exists(dirName):
@@ -137,7 +137,10 @@ def dump_constraints(df):
         constraint = "-cf-ilp-explicit-bound={0} -cf-ilp-implicit-bound={1} -cf-ilp-overhead-bound={2} ".format(int(prog['ilp_result.explicitMANIFEST']),int(prog['ilp_result.implicitMANIFEST']),prog['ilp_result.overheadMANIFEST'])
 #        constraint = "-cf-ilp-implicit-bound={0}  ".format(int(prog['ilp_result.implicitMANIFEST']))
         #constraint = "-cf-ilp-explicit-bound={0} -cf-ilp-overhead-bound={1} ".format(int(prog['ilp_result.explicitMANIFEST']),prog['ilp_result.overheadMANIFEST'])
-        fname = os.path.join(dirName,prog['program'])
+        filePath = os.path.join(dirName,prog['program'],str(prog['coverage'+obj.name]))
+        if not os.path.exists(filePath):
+            os.makedirs(filePath) 
+        fname =  os.path.join(filePath, str(prog['combination'+obj.name]))
         print(fname)
         f = open(fname, "w") 
         f.write(constraint) 
@@ -149,7 +152,7 @@ def main():
     df = df.drop(columns=['index'])
 #    df = df.drop(columns=['Name'])
     out = df.to_json(orient='records')
-    dump_constraints(df)    
+    dump_constraints(df,Objective.MANIFEST)    
     with open('extracted-constraints.json', 'w') as f:
          f.write(out)
 if __name__ == '__main__':

@@ -15,7 +15,7 @@ DG_PATH=${USR_LIB_DIR}
 OH_LIB=${OH_PATH}/$BUILD_DIR
 echo $OH_LIB
 echo $USR_LIB_DIR
-bc_files=/home/sip/eval/coverage_dataset/*.bc
+bc_files=/home/sip/eval/coverage/*.bc
 combination_path=/home/sip/eval/combination/
 binary_path="/home/sip/eval/binaries-${objective}"
 config_path=/home/sip/eval/lib-config/
@@ -26,7 +26,7 @@ blockfrequency=/home/sip/eval/blockfrequency
 #REPEAT=( 0 )
 #REPEAT=( 0 1 2 )
 #REPEAT=( 0 1 )
-REPEAT=( 1 )
+REPEAT=( 0 )
 STRATEGIES=('ilp' ) #either of 'ilp' or 'random' 
 
 mkdir -p binaries
@@ -41,11 +41,6 @@ do
 	if [ -f "${args_path}/${filename}" ]; then
 		cmd_args="${args_path}/${filename}"
 	fi
-        constraints_args=""
-        if [ -f "${constraints_path}/${filename}" ]; then
-                constraints_args=$(<${constraints_path}/${filename})
-        fi
-        echo $constraints_args
 	combination_dir=${combination_path}${filename}/*
 
 	libraries=""
@@ -56,7 +51,7 @@ do
 	echo "Libraries to link with $libraries"
 	for coverage_dir in ${combination_dir}
 	do
-		coverage_name=${coverage_dir##*/}
+	        coverage_name=${coverage_dir##*/}	
 		output_dir=${binary_path}/${filename}/${coverage_name}
 		mkdir -p ${output_dir}
 		#Generate unprotected binary for the baseline
@@ -92,6 +87,16 @@ do
 		for coverage in ${coverage_dir}/*
 		do
 			combination_file=${coverage##*/}
+                        constraints_file=$constraints_path/$filename/$coverage_name/$combination_file 
+                        echo $constraints_file
+                        constraints_args=""
+                        if [ -f "${constraints_file}" ]; then
+                          constraints_args=$(<${constraints_file})
+                        fi  
+                        echo $constraints_args
+                        continue
+                        exit 1
+
 			output_dir=${binary_path}/${filename}/${coverage_name}/${combination_file}
 
 			echo "Handling combination file $coverage"
@@ -139,7 +144,7 @@ do
                 cmd="${cmd} -load ${DG_PATH}/libLLVMdg.so"
                 cmd="${cmd} -load ${USR_LIB_DIR}/libUtils.so"
                 cmd="${cmd} -load ${USR_LIB_DIR}/libCompositionFramework.so"
-#                cmd="${cmd} -load ${USR_LIB_DIR}/libSCPass.so"
+                cmd="${cmd} -load ${USR_LIB_DIR}/libSCPass.so"
                 cmd="${cmd} -load ${OH_LIB}/liboblivious-hashing.so"
 #                cmd="${cmd} -load ${INPUT_DEP_PATH}/libTransforms.so"
                 #cmd="${cmd} -load ${CFI_PATH}/$BUILD_DIR/libControlFlowIntegrity.so"
@@ -156,17 +161,17 @@ do
                 cmd="${cmd} -profile-sample-accurate"
 		cmd="${cmd} -debug-pass=Structure"
                 # SC flags
- #               cmd="${cmd} -use-other-functions"
-  #              cmd="${cmd} -connectivity=1"
-   #             cmd="${cmd} -dump-checkers-network=${output_dir}/network_file"
-    #            cmd="${cmd} -dump-sc-stat=${output_dir}/sc.stats"
-#                cmd="${cmd} -filter-file=${coverage}"
+                cmd="${cmd} -use-other-functions"
+                cmd="${cmd} -connectivity=1"
+                cmd="${cmd} -dump-checkers-network=${output_dir}/network_file"
+                cmd="${cmd} -dump-sc-stat=${output_dir}/sc.stats"
+                cmd="${cmd} -filter-file=${coverage}"
                 # OH flags
                 cmd="${cmd} -protect-data-dep-loops"
                 cmd="${cmd} -num-hash 1"
                 cmd="${cmd} -dump-oh-stat=${output_dir}/oh.stats"
-#                cmd="${cmd} -exclude-main-unreachables"
- #               cmd="${cmd} -main-reach-cached"
+                cmd="${cmd} -exclude-main-unreachables"
+                cmd="${cmd} -main-reach-cached"
                 # CFI flags
                 #cmd="${cmd} -cfi-template ${CFI_PATH}/stack_analysis/StackAnalysis.c"
                 #cmd="${cmd} -cfi-outputdir ${output_dir}"
@@ -183,10 +188,10 @@ do
                 #cmd="${cmd} -cf-ilp-overhead-bound=353"
                 #cmd="${cmd} -cf-ilp-connectivity-bound=4"
                 #cmd="${cmd} -cf-ilp-blockconnectivity-bound=6"
-             #   cmd="${cmd} ${constraints_args}"
+                cmd="${cmd} ${constraints_args}"
                 cmd="${cmd} -cf-ilp-obj=${objective}"
                 # PASS ORDER
-     #           cmd="${cmd} -sc"
+                cmd="${cmd} -sc"
                 #cmd="${cmd} -control-flow-integrity"
 #                cmd="${cmd} -code-mobility"
                 cmd="${cmd} -oh-insert"
@@ -217,8 +222,8 @@ do
                 #gcc -no-pie -fPIC -g -rdynamic -c "${output_dir}/NewStackAnalysis.c" -o "${output_dir}/cfi_rtlib.o"
                 #LIB_FILES+=( "${output_dir}/cfi_rtlib.o" )
 
-      #          gcc -no-pie -fPIC -g -rdynamic -c "${SC_PATH}/rtlib.c" -o "${output_dir}/sc_rtlib.o"
-       #         LIB_FILES+=( "${output_dir}/sc_rtlib.o" )
+                gcc -no-pie -fPIC -g -rdynamic -c "${SC_PATH}/rtlib.c" -o "${output_dir}/sc_rtlib.o"
+                LIB_FILES+=( "${output_dir}/sc_rtlib.o" )
 
                 g++ -no-pie -fPIC -std=c++11 -g -rdynamic -shared -Wl,-soname,librtlib.so \
                     -o "${output_dir}/librtlib.so" ${LIB_FILES[@]} -lssl -lcrypto
