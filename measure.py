@@ -35,7 +35,8 @@ def process_files(directory):
                 for attempt_dir in get_immediate_subdirectories(combination_dir):
                     result_path = attempt_dir
                     attempt = os.path.basename(attempt_dir)
-
+                    if int(coverage) == 0:
+                        attempt =0
                     results = grab_results(result_path)
 
                     raw = json_normalize(data=results)
@@ -55,7 +56,11 @@ def process_files(directory):
 def grab_results(result_directory):
     runs_path = os.path.join(result_directory, "runs.json")
     if os.path.exists(runs_path):
-        return json.load(open(runs_path))
+        a= json.load(open(runs_path))
+        if a != {} and a != []:
+            return a
+        else:
+            print("Suspecious results:",result_directory)
     return [{'cputime': 0, 'memory': 0}]
 
 
@@ -101,6 +106,8 @@ def main():
         adf = df[df['attempt'] == attempt]
         adf.to_csv(os.path.join(binary_dir, "measurements-{}.csv".format(attempt)), index=False)
         adf.to_json(os.path.join(binary_dir, "measurements-{}.json".format(attempt)), orient='records')
+    #df.to_csv(os.path.join(binary_dir, "measurements.csv"), index=False)
+    #df.to_json(os.path.join(binary_dir, "measurements.json"), orient='records')
 
 
 # In[ ]:

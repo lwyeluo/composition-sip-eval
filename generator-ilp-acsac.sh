@@ -2,7 +2,7 @@
 set -euo pipefail
 source env.sh
 
-objective='overhead'
+objective='manifest'
 
 
 
@@ -17,7 +17,7 @@ echo $OH_LIB
 echo $USR_LIB_DIR
 bc_files=/home/sip/eval/coverage/*.bc
 combination_path=/home/sip/eval/combination/
-binary_path="/home/sip/eval/binaries-${objective}"
+binary_path="/home/sip/eval/binaries-acsac-${objective}"
 config_path=/home/sip/eval/lib-config/
 link_libraries=/home/sip/eval/link-libraries/
 args_path=/home/sip/eval/cmdline-args
@@ -161,6 +161,7 @@ do
 		cmd="${cmd} -debug-pass=Structure"
                 # SC flags
                 cmd="${cmd} -use-other-functions"
+                cmd="${cmd} -extracted-only"
                 cmd="${cmd} -connectivity=1"
                 cmd="${cmd} -dump-checkers-network=${output_dir}/network_file"
                 cmd="${cmd} -dump-sc-stat=${output_dir}/sc.stats"
@@ -187,7 +188,7 @@ do
                 #cmd="${cmd} -cf-ilp-overhead-bound=353"
                 #cmd="${cmd} -cf-ilp-connectivity-bound=4"
                 #cmd="${cmd} -cf-ilp-blockconnectivity-bound=6"
-                cmd="${cmd} ${constraints_args}"
+          #      cmd="${cmd} ${constraints_args}"
                 cmd="${cmd} -cf-ilp-obj=${objective}"
                 # PASS ORDER
                 cmd="${cmd} -sc"

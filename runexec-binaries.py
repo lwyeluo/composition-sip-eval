@@ -11,7 +11,7 @@ from shutil import copyfile
 from benchexec.runexecutor import RunExecutor
 
 REPEAT_NUMBER = 50
-BASE_REPEAT_NUMBER = 200
+BASE_REPEAT_NUMBER = 20
 RUNS_JSON = "runs.json"
 CMDLINE_ARGS = "cmdline-args"
 EXIT_CODES = {
@@ -27,7 +27,8 @@ def get_immediate_subdirectories(d):
 
 
 def repeats_for_directory(coverage_dir):
-    if coverage_dir == '0' or coverage_dir == '100':
+    cov = os.path.split(coverage_dir)[1]
+    if int(cov) == 0 or int(cov) == 100:
         return BASE_REPEAT_NUMBER
     return REPEAT_NUMBER
 
@@ -102,15 +103,37 @@ def measure_overhead(result_directory, program, repeat):
 
     # write results to the directory
     if len(results) != 0:
+        arr = [d['cputime'] for d in results]
+        print("uncleaned data: ",len(arr))
+        arr = reject_outliers(np.array(arr))
+        print("cleaned data: ",len(arr))
+        print(arr)
+        if len(arr) == 0:
+            print("All removed as outliers, relax the threshold...")
+            exit(1)
+        i = 0
+        for clean_measurement in arr:
+            results[i]['cpumean'] = clean_measurement
+            i+=1
+        results = results[:len(arr)]
+        if len(results) == 0:
+            print('No results ', result_directory)
+            exit(1)
         runs_path = os.path.join(result_directory, RUNS_JSON)
         with open(runs_path, 'w') as outfile:
             json.dump(results, outfile)
     else:
         print('Failed to run {} and thus no overhead results were captured'.format(program))
+        exit(1)
     return results
 
 REDO = False
 PROGRAMS = []
+def reject_outliers(data, m = 3.):
+    d = np.abs(data - np.median(data))
+    mdev = np.median(d)
+    s = d/mdev if mdev else 0.
+    return data[s<m]
 def process_files(directory):
     global REDO
     for program_dir in get_immediate_subdirectories(directory):
@@ -120,8 +143,13 @@ def process_files(directory):
                     result_path = attempt_dir
                     pname =os.path.basename(program_dir)
                     repeat_program = any(pname in p for p in PROGRAMS)
+                    runs_file = os.path.join(result_path, RUNS_JSON)
+                    if os.path.exists(runs_file): 
+                        with open(runs_file, 'r') as f:
+                            if len(json.load(f)) == 0:
+                                os.remove(runs_file)
                     # if processed file already exists, do not run the program again
-                    if not repeat_program and not REDO and os.path.exists(os.path.join(result_path, RUNS_JSON)):
+                    if not repeat_program and not REDO and os.path.exists(runs_file):
                         continue
 
                     repeat = repeats_for_directory(coverage_dir)
