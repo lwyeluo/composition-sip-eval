@@ -14,6 +14,7 @@ from itertools import islice
 import pprint
 import shutil
 from enum import Enum
+import sys
 # In[33]:
 
 
@@ -147,7 +148,12 @@ def dump_constraints(df,obj):
         f.close() 
 
 def main():
-    df = process_files("/home/sip/eval/binaries-acsac-manifest",Objective.MANIFEST)
+    if len(sys.argv) <2:
+      print('The path for constraint extraction need to be specified')
+      exit(1)
+    path = sys.argv[1]
+    print('Reading constraints from ', path)
+    df = process_files(path,Objective.MANIFEST)
     df = df.reset_index()
     df = df.drop(columns=['index'])
 #    df = df.drop(columns=['Name'])
