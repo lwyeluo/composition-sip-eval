@@ -3,7 +3,8 @@ set -xeou pipefail
 #run clone and extraction passed to identify function names for the combination generator
 ./coverage-improver.sh $@
 #extract filter fils (i.e. combinations) from the list of available function names
-./combinator.sh $@
+#for this experiment we only need coverage of 100% protection, no partial protections needed
+./combinator.sh 0 100
 #create performance data with block frequencies
 ./blockfrequency.sh $@
 
@@ -15,7 +16,7 @@ set -xeou pipefail
 python constraint_extractor.py binaries-manifest
 
 #optimize for overhead with the maximum protection constraints
-./generator-ilp.sh binaries-manifest "overhead"
+./generator-ilp.sh binaries-overhead "overhead"
 if [ $? -eq 0 ]; then
         echo 'OK Generator 6.4'
 else
