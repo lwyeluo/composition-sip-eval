@@ -91,10 +91,10 @@ def main():
         results = parser.parse_args()
         OVERHEAD_IN_PERCENTAGE = results.percentage
         programs,overheads = read("binaries-acsac-overhead/measurements-0.json")
-        _,overheads_sc = read("binaries-acsac-manifest/measurements-0.json")
+        _,overheads_manifest = read("binaries-acsac-manifest/measurements-0.json")
         print ('OVERHEADS')
         perc_overheads = overhead_in_percentage(overheads)
-        perc_overheads_sc = overhead_in_percentage(overheads_sc)
+        perc_overheads_manifest = overhead_in_percentage(overheads_manifest)
         program_count=len(overheads[0]['programs'])
         coverage_labels=[]
         E = 1 # number of empty gaps between programs
@@ -138,6 +138,7 @@ def main():
 	#keys(1)
         i =0
         diffsum = []
+        print "Overhead averages for combinations"
         for coverage in coverage_keys:
 	    #cpu_means.append(overhead['cpu_mean'])
 	    #cpu_stds.append(overhead['cpu_std'])
@@ -149,23 +150,25 @@ def main():
             columns = ind[i:len(ind)-1:M+E]
              
             means_arr = np.pad(np.array(overheads[int(coverage)][means_dic_name]),(0,len(columns)-len(overheads[int(coverage)][means_dic_name])),'constant')
-            means_arr_sc = np.pad(np.array(overheads_sc[int(coverage)][means_dic_name]),(0,len(columns)-len(overheads_sc[int(coverage)][means_dic_name])),'constant')
+            means_arr_manifest = np.pad(np.array(overheads_manifest[int(coverage)][means_dic_name]),(0,len(columns)-len(overheads_manifest[int(coverage)][means_dic_name])),'constant')
             #print(zip(programs,means_arr))
-            #print(means_arr_sc)
-            diff = np.subtract(means_arr_sc, means_arr)
-            pprint(zip(programs,diff))
+            #print(means_arr_manifest)
+            diff = np.subtract(means_arr_manifest, means_arr)
+            #pprint(zip(programs,diff))
             if len(diffsum) ==0:
                 diffsum = diff
             else:
                 diffsum = np.add(diffsum, diff)
             stds_arr = np.pad(np.array(overheads[int(coverage)][stds_dic_name]),(0,len(columns)-len(overheads[int(coverage)][stds_dic_name])),'constant')
-            stds_arr_sc = np.pad(np.array(overheads_sc[int(coverage)][stds_dic_name]),(0,len(columns)-len(overheads_sc[int(coverage)][stds_dic_name])),'constant')
+            stds_arr_sc = np.pad(np.array(overheads_manifest[int(coverage)][stds_dic_name]),(0,len(columns)-len(overheads_manifest[int(coverage)][stds_dic_name])),'constant')
             
-            #means_arr = np.subtract(means_arr, means_arr_sc)
-            rects2 = ax.bar(columns,means_arr_sc, width, color=ax_color,edgecolor='gray', capsize=3)#,tick_label=[coverage]*N)
+            #means_arr = np.subtract(means_arr, means_arr_manifest)
+            rects2 = ax.bar(columns,means_arr_manifest, width, color=ax_color,edgecolor='gray', capsize=3)#,tick_label=[coverage]*N)
             rects1 = ax.bar(columns,means_arr, width, color=ax_color, edgecolor='black', capsize=2, error_kw={'ecolor':'red','linewidth':00.1,'alpha':0.4}, yerr=stds_arr,label=coverage+'%')#,tick_label=[coverage]*N)
             i+=1
             rects.append(rects1)
+            print coverage,"OPTIMIZED MEAN:",np.mean(means_arr), " STD:", np.std(means_arr)
+            print coverage,"MANIFEST MEAN:",np.mean(means_arr_manifest), " STD:", np.std(means_arr_manifest)
         #print(diffsum)
         ax.set_ylabel('Overhead in percentage')
         t = np.arange(np.min(ind),np.max(ind)+1, width)

@@ -21,7 +21,10 @@ def read(file_path):
             overhead[program['coverage']]['cpu_stds'] = []
             overhead[program['coverage']]['programs'] = []
 
-        overhead[program['coverage']]['cpu_means'].append(program['cputime_median'])
+        if int(program['coverage'])==0:
+            overhead[program['coverage']]['cpu_means'].append(program['cputime_mean'])
+        else:
+            overhead[program['coverage']]['cpu_means'].append(program['cputime_mean'])
         overhead[program['coverage']]['cpu_stds'].append(program['cputime_std'])
         overhead[program['coverage']]['programs'].append(program['program'])
 
