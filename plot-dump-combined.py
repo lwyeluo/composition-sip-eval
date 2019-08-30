@@ -150,10 +150,10 @@ def main():
              
             means_arr = np.pad(np.array(overheads[int(coverage)][means_dic_name]),(0,len(columns)-len(overheads[int(coverage)][means_dic_name])),'constant')
             means_arr_sc = np.pad(np.array(overheads_sc[int(coverage)][means_dic_name]),(0,len(columns)-len(overheads_sc[int(coverage)][means_dic_name])),'constant')
-            #print(zip(programs,means_arr))
-            #print(means_arr_sc)
             diff = np.subtract(means_arr_sc, means_arr)
-            pprint(zip(programs,diff))
+            print('Coverage group:',coverage)
+            print('(Program, Unoptimized overhead, Optimized Overhead, Diff)')
+            print(zip(programs,means_arr_sc,means_arr,diff))
             if len(diffsum) ==0:
                 diffsum = diff
             else:

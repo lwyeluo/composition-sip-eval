@@ -1,70 +1,57 @@
 #!/usr/bin/env bash
 set -xeou pipefail
+
+rm -r -f coverage
 #run clone and extraction passed to identify function names for the combination generator
-./coverage-improver.sh $@
-#extract filter fils (i.e. combinations) from the list of available function names
-./combinator.sh $@
+./coverage-improver.sh 
 #create performance data with block frequencies
-./blockfrequency.sh $@
+./blockfrequency.sh 
+
+#we need all the combinations to compare with the SROH paper (heuristic-based)
+rm -r -f combination
+./combinator.sh 0 10 25 50 100
 
 
-############### BEGIN Section 6.4 ##################
-
+############### BEGIN Section 6.5 ##################
+#IMPORTANT: make sure there is no constraints, otherwise the ilp generator will force them on the solution
+rm -r -f constraints
+#generate SROH benchmark (based on https://github.com/mr-ma/sip-eval/tree/acsac)
+./generator-ilp-acsac.sh manifest 
 #extract constraints from the maximum manifest setting
-python constraint_extractor.py binaries-manifest
-
+python constraint_extractor.py binaries-acsac-manifest
+#Constraints will be read when available
 #optimize for overhead with the maximum protection constraints
-./generator-ilp.sh binaries-manifest "overhead"
+./generator-ilp-acsac.sh "overhead"
 if [ $? -eq 0 ]; then
-        echo 'OK Generator 6.4'
+        echo 'OK Generator '
 else
-        echo 'FAIL Generator 6.4'
+        echo 'FAIL Generator'
         exit
 fi
 
 #run binaries
-./runexec-binaries.py binaries-manifest
+./runexec-binaries.py binaries-acsac-manifest
 if [ $? -eq 0 ]; then
-        echo 'OK runexec binaries-manifest 6.4'
+        echo 'OK runexec binaries-manifest '
 else
-        echo 'FAIL runexec binaries-manifest 6.4'
+        echo 'FAIL runexec binaries-manifest '
         exit
 fi
 
 #run binaries
-./runexec-binaries.py binaries-overhead
+./runexec-binaries.py binaries-acsac-overhead
 if [ $? -eq 0 ]; then
-        echo 'OK runexec binaries-overhead 6.4'
+        echo 'OK runexec binaries-overhead '
 else
-        echo 'FAIL runexec binaries-overhead 6.4'
+        echo 'FAIL runexec binaries-overhead '
         exit
 fi
 
-./measure.py binaries-manifest/
-./measure.py binaries-overhead/
-python dump-ilp-results.py
-echo 'Results are dumped in ilp_optimization_results.csv'
+./measure.py binaries-acsac-manifest/
+./measure.py binaries-acsac-overhead/
 ############### END Section 6.4 ##################
 
 
-#run each protected program and measure the overhead imposed by the protection
-./runexec-binaries.py binaries/
-if [ $? -eq 0 ]; then
-	echo 'OK runexec'
-else
-	echo 'FAIL runexec'
-	exit
-fi
-#extract measured cpu and memory overhead
-./measure.py binaries/
-if [ $? -eq 0 ]; then
-	echo 'OK measure'
-else
-	echo 'FAIL measure'
-	exit
-fi
-#dump clone and extraction coverage improvement latex table
-#python measure-coverage-improvements.py
-#plot the extracted overhead data and dump protection coverage latex table
-python plot-dump.py
+python plot-dump-combined.py -p True
+echo 'Benchmark is dumped into performance-evaluation-combined-percentage.pdf' 
 
