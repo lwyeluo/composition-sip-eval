@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -xeou pipefail
+rm -r -f binaries*
 rm -r -f coverage
 #run clone and extraction passed to identify function names for the combination generator
 ./coverage-improver.sh $@
