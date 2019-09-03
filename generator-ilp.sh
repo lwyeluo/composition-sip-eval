@@ -39,11 +39,7 @@ do
 	if [ -f "${args_path}/${filename}" ]; then
 		cmd_args="${args_path}/${filename}"
 	fi
-        constraints_args=""
-        if [ -f "${constraints_path}/${filename}" ]; then
-                constraints_args=$(<${constraints_path}/${filename})
-        fi
-        echo $constraints_args
+        
 	combination_dir=${combination_path}${filename}/*
 
 	libraries=""
@@ -91,7 +87,11 @@ do
 		do
 			combination_file=${coverage##*/}
 			output_dir=${binary_path}/${filename}/${coverage_name}/${combination_file}
-
+                        constraints_args=""
+                        if [ -f "${constraints_path}/${filename}/${coverage_name}/${combination_file}" ]; then
+                          constraints_args=$(<${constraints_path}/${filename}/${coverage_name}/${combination_file})
+                        fi
+                        echo $constraints_args
 			echo "Handling combination file $coverage"
 			echo "Protect $bc with function combination file $coverage"
 			#repeat protection for random network of protection

@@ -52,7 +52,7 @@ do
     set -e
 
     mv $(pwd)/default_*.profraw "${output}/default.profraw"
-    llvm-profdata merge "${output}/default.profraw" -output="${output}/${filename}.prof"
+    llvm-profdata-7 merge "${output}/default.profraw" -output="${output}/${filename}.prof"
     rm "${output}/default.profraw"
 done
 

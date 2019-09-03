@@ -14,6 +14,8 @@ from itertools import islice
 import pprint
 import shutil
 from enum import Enum
+from measure import replace_name
+import sys
 # In[33]:
 
 
@@ -29,9 +31,18 @@ def get_immediate_subdirectories(d):
 
 # In[34]:
 
-
+def read_measurements(path):
+    with open(path) as f:
+      return json.load(f)
 def process_files(directory,objective):
     all_df = pd.DataFrame()
+    performance_baseline_path = os.path.join(directory,'measurements-0.json')
+    performance_100_path = os.path.join(directory,'measurements-1.json')
+    perf_base=perf_100 = []
+    if os.path.exists(performance_baseline_path):
+      perf_base = read_measurements(performance_baseline_path)
+    if os.path.exists(performance_100_path):
+      perf_100 = read_measurements(performance_100_path)
     for program_dir in get_immediate_subdirectories(directory):
         program = os.path.basename(program_dir)
         for coverage_dir in sorted(get_immediate_subdirectories(program_dir)):
@@ -49,14 +60,30 @@ def process_files(directory,objective):
 
                     ilp_results,state_results = grab_results(result_path,objective)
 
-                    df = json_normalize(data={'coverage':int(coverage),'combination':int(combination),'ilp_result':ilp_results,'stats_result':state_results})
+                    #get perf numbers if available
+                    cpu_base_median = get_cpu_median_from_perf(perf_base,program,0)
+                    cpu_100_median = get_cpu_median_from_perf(perf_100,program,100)
+                    print(cpu_base_median,cpu_100_median) 
+                    df = json_normalize(data={'coverage':int(coverage),'combination':int(combination),'ilp_result':ilp_results,'stats_result':state_results,'cpu_baseline_median':cpu_base_median, 'cpu_100_median':cpu_100_median})
                     df.insert(0, 'program', program)
     #                print(df)
                     all_df = all_df.append(df, sort=False)
 
+    
     all_df.columns+=objective.name
     all_df = all_df.rename(columns={'program'+objective.name:'program'})
     return all_df
+
+def get_cpu_median_from_perf(perf,program,coverage):
+  if len(perf)!=0:
+    hit = filter(lambda p: p['program'] == replace_name(program) and int(p['coverage'])==int(coverage), perf)
+    if len(hit)!=0:
+      return hit[0]['cputime_median']
+    else:
+      print('Not FOUND', replace_name(program), coverage)
+      print(perf)
+      exit(1)
+  return 0.0
 
 
 # In[35]:
@@ -147,7 +174,12 @@ def dump_constraints(df,obj):
         f.close() 
 
 def main():
-    df = process_files("/home/sip/eval/binaries-acsac-manifest",Objective.MANIFEST)
+    if len(sys.argv) <2:
+      print('The path for constraint extraction need to be specified')
+      exit(1)
+    path = sys.argv[1]
+    print('Reading constraints from ', path)
+    df = process_files(path,Objective.MANIFEST)
     df = df.reset_index()
     df = df.drop(columns=['index'])
 #    df = df.drop(columns=['Name'])

@@ -2,11 +2,8 @@
 set -euo pipefail
 source env.sh
 
-objective='manifest'
-
-
-
-
+objective=$1
+echo $objective
 
 
 USR_LIB_DIR=/usr/local/lib
@@ -188,7 +185,7 @@ do
                 #cmd="${cmd} -cf-ilp-overhead-bound=353"
                 #cmd="${cmd} -cf-ilp-connectivity-bound=4"
                 #cmd="${cmd} -cf-ilp-blockconnectivity-bound=6"
-          #      cmd="${cmd} ${constraints_args}"
+                cmd="${cmd} ${constraints_args}"
                 cmd="${cmd} -cf-ilp-obj=${objective}"
                 # PASS ORDER
                 cmd="${cmd} -sc"
@@ -204,7 +201,6 @@ do
 #		perf record --call-graph dwarf ${cmd}
                 ${cmd} |& tee "${output_dir}/transform.console"
                 echo "EAT ME:\n$cmd"
-
                 echo ${output_dir}
                 if [ $? -eq 0 ]; then
                     echo 'OK Transform'
