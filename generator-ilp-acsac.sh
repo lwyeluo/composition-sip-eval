@@ -176,7 +176,7 @@ do
                 cmd="${cmd} -cf-strategy=${STRATEGIES[0]}"
                 cmd="${cmd} -cf-dump-graphs"
                 cmd="${cmd} -cf-stats=${output_dir}/composition.stats"
-		cmd="${cmd} -cf-ilp-prob=${output_dir}/problem.txt"
+		cmd="${cmd} -cf-ilp-prob=${output_dir}/problem.lp"
 		cmd="${cmd} -cf-ilp-sol=${output_dir}/solution.txt"
 		cmd="${cmd} -cf-ilp-sol-readable=${output_dir}/solution_readable.txt"
                 cmd="${cmd} -cf-patchinfo=${output_dir}/cf-patchinfo.json"
@@ -193,6 +193,7 @@ do
 #                cmd="${cmd} -code-mobility"
                 cmd="${cmd} -oh-insert"
                 cmd="${cmd} -short-range-oh"
+                cmd="${cmd} -cf-experimental-scip"
                 cmd="${cmd} -composition-framework"
 	        cmd="${cmd} -time-passes"
                 # End of command
