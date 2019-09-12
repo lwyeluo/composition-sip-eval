@@ -172,7 +172,7 @@ do
                 cmd="${cmd} -cf-strategy=${STRATEGIES[0]}"
                 cmd="${cmd} -cf-dump-graphs"
                 cmd="${cmd} -cf-stats=${output_dir}/composition.stats"
-		cmd="${cmd} -cf-ilp-prob=${output_dir}/problem.txt"
+		cmd="${cmd} -cf-ilp-prob=${output_dir}/problem.lp"
 		cmd="${cmd} -cf-ilp-sol=${output_dir}/solution.txt"
 		cmd="${cmd} -cf-ilp-sol-readable=${output_dir}/solution_readable.txt"
                 cmd="${cmd} -cf-patchinfo=${output_dir}/cf-patchinfo.json"
@@ -183,6 +183,7 @@ do
                 #cmd="${cmd} -cf-ilp-blockconnectivity-bound=6"
                 cmd="${cmd} ${constraints_args}"
                 cmd="${cmd} -cf-ilp-obj=${objective}"
+		cmd="${cmd} -cf-experimental-scip"
                 # PASS ORDER
                 cmd="${cmd} -sc"
                 cmd="${cmd} -control-flow-integrity"

@@ -185,7 +185,9 @@ do
                 #cmd="${cmd} -cf-ilp-overhead-bound=353"
                 #cmd="${cmd} -cf-ilp-connectivity-bound=4"
                 #cmd="${cmd} -cf-ilp-blockconnectivity-bound=6"
-                cmd="${cmd} ${constraints_args}"
+		if [ $1 != "manifest" ]; then
+                  cmd="${cmd} ${constraints_args}"
+	        fi
                 cmd="${cmd} -cf-ilp-obj=${objective}"
                 # PASS ORDER
                 cmd="${cmd} -sc"
@@ -193,7 +195,7 @@ do
 #                cmd="${cmd} -code-mobility"
                 cmd="${cmd} -oh-insert"
                 cmd="${cmd} -short-range-oh"
-                cmd="${cmd} -cf-experimental-scip"
+               # cmd="${cmd} -cf-experimental-scip"
                 cmd="${cmd} -composition-framework"
 	        cmd="${cmd} -time-passes"
                 # End of command
