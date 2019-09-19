@@ -4,4 +4,3 @@ int
 -outfile
 output_small_decode.ppm
 /home/sip/eval/cmdline-args/djpeg_input_small.jpg
-

@@ -8,7 +8,7 @@ echo $objective
 
 USR_LIB_DIR=/usr/local/lib
 INPUT_DEP_PATH=${USR_LIB_DIR}
-DG_PATH=${USR_LIB_DIR}
+DG_PATH=/home/sip/dg/build/lib
 OH_LIB=${OH_PATH}/$BUILD_DIR
 echo $OH_LIB
 echo $USR_LIB_DIR
@@ -18,7 +18,7 @@ binary_path="/home/sip/eval/binaries-acsac-${objective}"
 config_path=/home/sip/eval/lib-config/
 link_libraries=/home/sip/eval/link-libraries/
 args_path=/home/sip/eval/cmdline-args
-constraints_path=/home/sip/eval/constraints
+constraints_path=/home/sip/eval/constraints-acsac
 blockfrequency=/home/sip/eval/blockfrequency
 #REPEAT=( 0 )
 #REPEAT=( 0 1 2 )
@@ -89,7 +89,10 @@ do
                         echo $constraints_file
                         constraints_args=""
                         if [ -f "${constraints_file}" ]; then
-                          constraints_args=$(<${constraints_file})
+                          if [ $1 != "manifest" ]; then
+				  constraints_args=$(<${constraints_file})
+				  echo "CONSTRAINTS=${constraints_args=}"
+			  fi
                         fi  
 			echo $output_dir
                         echo $constraints_args
@@ -180,12 +183,21 @@ do
 		cmd="${cmd} -cf-ilp-sol=${output_dir}/solution.txt"
 		cmd="${cmd} -cf-ilp-sol-readable=${output_dir}/solution_readable.txt"
                 cmd="${cmd} -cf-patchinfo=${output_dir}/cf-patchinfo.json"
+		cmd="${cmd} -cf-experimental-scip"
+                cmd="${cmd} -cf-experimental-networkx"
+                cmd="${cmd} -cf-experimental-networkx-cyclefile=${output_dir}/cycles.txt"
+                cmd="${cmd} -cf-experimental-networkx-edgefile=${output_dir}/edges.csv"
+
 #                cmd="${cmd} -cf-ilp-implicit-bound=1401"
 #                cmd="${cmd} -cf-ilp-explicit-bound=1284"
                 #cmd="${cmd} -cf-ilp-overhead-bound=353"
                 #cmd="${cmd} -cf-ilp-connectivity-bound=4"
                 #cmd="${cmd} -cf-ilp-blockconnectivity-bound=6"
-		if [ $1 != "manifest" ]; then
+		if [ ${objective} != "manifest" ]; then
+		  if [ -z ${constraints_args} ]; then 
+			  echo "no execution if we don't have constraints"
+			  continue
+		  fi
                   cmd="${cmd} ${constraints_args}"
 	        fi
                 cmd="${cmd} -cf-ilp-obj=${objective}"

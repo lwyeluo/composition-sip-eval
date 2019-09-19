@@ -11,7 +11,7 @@ objective='overhead'
 
 USR_LIB_DIR=/usr/local/lib
 INPUT_DEP_PATH=${USR_LIB_DIR}
-DG_PATH=${USR_LIB_DIR}
+DG_PATH=/home/sip/dg/build/lib
 OH_LIB=${OH_PATH}/$BUILD_DIR
 bc_files=/home/sip/eval/coverage/*.bc
 combination_path=/home/sip/eval/combination/
@@ -51,6 +51,10 @@ do
 	for coverage_dir in ${combination_dir}
 	do
 		coverage_name=${coverage_dir##*/}
+		 if [ ${coverage_name} -eq 10 ] ||  [ ${coverage_name} -eq 25 ] ||  [ ${coverage_name} -eq 50 ];  then
+                        continue
+                fi
+
 		output_dir=${binary_path}/${filename}/${coverage_name}
 		mkdir -p ${output_dir}
 		#Generate unprotected binary for the baseline
@@ -155,12 +159,13 @@ do
 		cmd="${cmd} -debug-pass=Structure"
                 # SC flags
                 cmd="${cmd} -use-other-functions"
+		cmd="${cmd} -extracted-only"
                 cmd="${cmd} -connectivity=1"
                 cmd="${cmd} -dump-checkers-network=${output_dir}/network_file"
                 cmd="${cmd} -dump-sc-stat=${output_dir}/sc.stats"
                 cmd="${cmd} -filter-file=${coverage}"
                 # OH flags
-                #cmd="${cmd} -protect-data-dep-loops"
+                cmd="${cmd} -protect-data-dep-loops"
                 cmd="${cmd} -num-hash 1"
                 cmd="${cmd} -dump-oh-stat=${output_dir}/oh.stats"
                 cmd="${cmd} -exclude-main-unreachables"
@@ -176,6 +181,11 @@ do
 		cmd="${cmd} -cf-ilp-sol=${output_dir}/solution.txt"
 		cmd="${cmd} -cf-ilp-sol-readable=${output_dir}/solution_readable.txt"
                 cmd="${cmd} -cf-patchinfo=${output_dir}/cf-patchinfo.json"
+		cmd="${cmd} -cf-experimental-scip"
+                cmd="${cmd} -cf-experimental-networkx"
+                cmd="${cmd} -cf-experimental-networkx-cyclefile=${output_dir}/cycles.txt"
+                cmd="${cmd} -cf-experimental-networkx-edgefile=${output_dir}/edges.csv"
+
 #                cmd="${cmd} -cf-ilp-implicit-bound=1401"
 #                cmd="${cmd} -cf-ilp-explicit-bound=1284"
                 #cmd="${cmd} -cf-ilp-overhead-bound=353"
@@ -183,7 +193,6 @@ do
                 #cmd="${cmd} -cf-ilp-blockconnectivity-bound=6"
                 cmd="${cmd} ${constraints_args}"
                 cmd="${cmd} -cf-ilp-obj=${objective}"
-		cmd="${cmd} -cf-experimental-scip"
                 # PASS ORDER
                 cmd="${cmd} -sc"
                 cmd="${cmd} -control-flow-integrity"

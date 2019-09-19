@@ -4,7 +4,7 @@ source env.sh
 
 USR_LIB_DIR=/usr/local/lib
 INPUT_DEP_PATH=${USR_LIB_DIR}
-DG_PATH=${USR_LIB_DIR}
+DG_PATH=/home/sip/dg/build/lib
 OH_LIB=${OH_PATH}/$BUILD_DIR
 bc_files=/home/sip/eval/coverage/*.bc
 combination_path=/home/sip/eval/combination/
@@ -43,6 +43,9 @@ do
 	for coverage_dir in ${combination_dir}
 	do
 		coverage_name=${coverage_dir##*/}
+		if [ ${coverage_name} -eq 10 ] ||  [ ${coverage_name} -eq 25 ] ||  [ ${coverage_name} -eq 50 ];  then
+			continue
+		fi
 		output_dir=${binary_path}/${filename}/${coverage_name}
 		mkdir -p ${output_dir}
 		#Generate unprotected binary for the baseline
@@ -143,7 +146,7 @@ do
 		cmd="${cmd} -debug-pass=Structure"
                 # SC flags
                 cmd="${cmd} -use-other-functions"
-                #cmd="${cmd} -extracted-only"
+                cmd="${cmd} -extracted-only"
                 cmd="${cmd} -connectivity=1"
                 cmd="${cmd} -dump-checkers-network=${output_dir}/network_file"
                 cmd="${cmd} -dump-sc-stat=${output_dir}/sc.stats"

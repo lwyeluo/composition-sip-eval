@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -xeou pipefail
-rm -r -f binaries*
-rm -r -f coverage
+#rm -r -f binaries*
+#rm -r -f coverage
 #run clone and extraction passed to identify function names for the combination generator
 ./coverage-improver.sh 
 #create performance data with block frequencies
 ./blockfrequency.sh 
 
 #we need all the combinations to compare with the SROH paper (heuristic-based)
-rm -r -f combination
+#rm -r -f combination
 ./combinator.sh 0 10 25 50 100
 
 
@@ -18,7 +18,7 @@ rm -r -f constraints
 #generate SROH benchmark (based on https://github.com/mr-ma/sip-eval/tree/acsac)
 ./generator-ilp-acsac.sh manifest 
 #extract constraints from the maximum manifest setting
-python constraint_extractor.py binaries-acsac-manifest
+python constraint_extractor.py binaries-acsac-manifest constraints-acsac
 #Constraints will be read when available
 #optimize for overhead with the maximum protection constraints
 ./generator-ilp-acsac.sh "overhead"

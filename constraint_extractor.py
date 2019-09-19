@@ -59,12 +59,14 @@ def process_files(directory,objective):
                     attempt = os.path.basename(attempt_dir)
 
                     ilp_results,state_results = grab_results(result_path,objective)
-
+                    if ilp_results == None:
+                        ilp_results = {'manifest':state_results['manifest'], 'explicit':state_results['explicit'], 'implicit':state_results['implicit'], 'overhead':0}
                     #get perf numbers if available
                     cpu_base_median = get_cpu_median_from_perf(perf_base,program,0)
                     cpu_100_median = get_cpu_median_from_perf(perf_100,program,100)
+                    overhead = (cpu_100_median - cpu_base_median)/cpu_base_median*100
                     print(cpu_base_median,cpu_100_median) 
-                    df = json_normalize(data={'coverage':int(coverage),'combination':int(combination),'ilp_result':ilp_results,'stats_result':state_results,'cpu_baseline_median':cpu_base_median, 'cpu_100_median':cpu_100_median})
+                    df = json_normalize(data={'coverage':int(coverage),'combination':int(combination),'ilp_result':ilp_results,'stats_result':state_results,'overhead_median_percentage':overhead})
                     df.insert(0, 'program', program)
     #                print(df)
                     all_df = all_df.append(df, sort=False)
@@ -76,7 +78,7 @@ def process_files(directory,objective):
 
 def get_cpu_median_from_perf(perf,program,coverage):
   if len(perf)!=0:
-    hit = filter(lambda p: p['program'] == replace_name(program) and int(p['coverage'])==int(coverage), perf)
+    hit = list(filter(lambda p: p['program'] == replace_name(program) and int(p['coverage'])==int(coverage), perf))
     if len(hit)!=0:
       return hit[0]['cputime_median']
     else:
@@ -92,21 +94,23 @@ def get_cpu_median_from_perf(perf,program,coverage):
 def grab_results(result_directory,objective):
     stats_path = os.path.join(result_directory, "composition.stats")
     ilp_solution_path = os.path.join(result_directory, "solution_readable.txt")
-    ilp_result =  {'explicit':0, 'implicit':0, 'overhead':0}
+    ilp_result = None 
+    # {'explicit':0, 'implicit':0, 'overhead':0}
     stats_result = {'explicit':0, 'implicit':0}
     if os.path.exists(ilp_solution_path):
         manifest, explicit, implicit, overhead = read_solution_file(ilp_solution_path,objective)
         ilp_result = {'manifest':manifest,'explicit':explicit, 'implicit':implicit, 'overhead':overhead}
     if os.path.exists(stats_path):    
-        explicit, implicit = read_stats_file(stats_path)
-        stats_result = {'explicit':explicit, 'implicit':implicit}
+        manifest, explicit, implicit = read_stats_file(stats_path)
+        stats_result = {'manifest':manifest, 'explicit':explicit, 'implicit':implicit}
     return ilp_result, stats_result
 
 def read_stats_file(path):
     stats = json.load(open(path))['stats']
+    manifest = int(stats['numberOfManifests'])
     explicit = int(stats['numberOfProtectedDistinctInstructions'])
     implicit = int(stats['numberOfDistinctImplicitlyProtectedInstructions'])
-    return explicit, implicit
+    return manifest, explicit, implicit
 def read_solution_file(path,objective):
     with open(path) as f:
        lines = list(islice(f, 12))
@@ -153,8 +157,7 @@ def replace_name(p):
 
 # In[38]:
 
-def dump_constraints(df,obj):
-    dirName = 'constraints'
+def dump_constraints(df,obj,dirName):
     pp = pprint.PrettyPrinter(indent=4)
     if os.path.exists(dirName):
         shutil.rmtree(dirName)
@@ -184,7 +187,10 @@ def main():
     df = df.drop(columns=['index'])
 #    df = df.drop(columns=['Name'])
     out = df.to_json(orient='records')
-    dump_constraints(df,Objective.MANIFEST)    
+    outDir = 'constraints'
+    if len(sys.argv)==3:
+        outDir = sys.argv[2]
+    dump_constraints(df,Objective.MANIFEST,outDir)    
     with open('extracted-constraints.json', 'w') as f:
          f.write(out)
 if __name__ == '__main__':
