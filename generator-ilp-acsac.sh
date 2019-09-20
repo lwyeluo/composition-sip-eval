@@ -92,6 +92,10 @@ do
                           if [ $1 != "manifest" ]; then
 				  constraints_args=$(<${constraints_file})
 				  echo "CONSTRAINTS=${constraints_args=}"
+                                  if [ -z ${constraints_args} ]; then 
+			            echo "no execution if we don't have constraints"
+			            continue
+                                  fi
 			  fi
                         fi  
 			echo $output_dir
@@ -194,10 +198,7 @@ do
                 #cmd="${cmd} -cf-ilp-connectivity-bound=4"
                 #cmd="${cmd} -cf-ilp-blockconnectivity-bound=6"
 		if [ ${objective} != "manifest" ]; then
-		  if [ -z ${constraints_args} ]; then 
-			  echo "no execution if we don't have constraints"
-			  continue
-		  fi
+		  
                   cmd="${cmd} ${constraints_args}"
 	        fi
                 cmd="${cmd} -cf-ilp-obj=${objective}"

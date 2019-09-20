@@ -148,12 +148,20 @@ def main():
             ax_hatch = coverage_hatch[int(coverage)]
             columns = ind[i:len(ind)-1:M+E]
              
-            means_arr = np.pad(np.array(overheads[int(coverage)][means_dic_name]),(0,len(columns)-len(overheads[int(coverage)][means_dic_name])),'constant')
-            means_arr_sc = np.pad(np.array(overheads_sc[int(coverage)][means_dic_name]),(0,len(columns)-len(overheads_sc[int(coverage)][means_dic_name])),'constant')
+            opt_arr = np.array(overheads[int(coverage)][means_dic_name])
+            opt_arr = np.clip(opt_arr,1,20000000000)
+            opt_arr_len = len(opt_arr)
+
+            means_arr = np.pad(opt_arr,(0,len(columns)-opt_arr_len),'constant')
+            sc_array = np.array(overheads_sc[int(coverage)][means_dic_name])
+            sc_array = np.clip(sc_array,1,20000000000)
+            len_sc_array = len(overheads_sc[int(coverage)][means_dic_name])
+            means_arr_sc = np.pad(sc_array,(0,len(columns)-len_sc_array),'constant')
             diff = np.subtract(means_arr_sc, means_arr)
             print('Coverage group:',coverage)
             print('(Program, Unoptimized overhead, Optimized Overhead, Diff)')
-            print(zip(programs,means_arr_sc,means_arr,diff))
+            #print(zip(programs,means_arr_sc,means_arr,diff))
+            print(np.mean(means_arr), np.mean(means_arr_sc))
             if len(diffsum) ==0:
                 diffsum = diff
             else:
@@ -172,6 +180,7 @@ def main():
         ax.set_xticks(np.arange(np.min(ind),np.max(ind)+1, width))
         ax.set_xticklabels(prepare_xtick_labels(coverage_labels,programs,E,N,M))
         ax.set_yscale('log',basey=2)
+        #ax.set_ylim(0,20000)
         ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda y, _: '{:g}'.format(y)))
         plt.xticks(rotation=60)
         plt.legend(bbox_to_anchor=(0., 1.02, 1., .102),loc='upper right', ncol=4, mode="expand", borderaxespad=0.)

@@ -64,7 +64,9 @@ def process_files(directory,objective):
                     #get perf numbers if available
                     cpu_base_median = get_cpu_median_from_perf(perf_base,program,0)
                     cpu_100_median = get_cpu_median_from_perf(perf_100,program,100)
-                    overhead = (cpu_100_median - cpu_base_median)/cpu_base_median*100
+                    overhead = 0.0
+                    if cpu_base_median!=0:
+                      overhead = (cpu_100_median - cpu_base_median)/cpu_base_median*100
                     print(cpu_base_median,cpu_100_median) 
                     df = json_normalize(data={'coverage':int(coverage),'combination':int(combination),'ilp_result':ilp_results,'stats_result':state_results,'overhead_median_percentage':overhead})
                     df.insert(0, 'program', program)
@@ -96,7 +98,7 @@ def grab_results(result_directory,objective):
     ilp_solution_path = os.path.join(result_directory, "solution_readable.txt")
     ilp_result = None 
     # {'explicit':0, 'implicit':0, 'overhead':0}
-    stats_result = {'explicit':0, 'implicit':0}
+    stats_result = {'manifest':0,'explicit':0, 'implicit':0}
     if os.path.exists(ilp_solution_path):
         manifest, explicit, implicit, overhead = read_solution_file(ilp_solution_path,objective)
         ilp_result = {'manifest':manifest,'explicit':explicit, 'implicit':implicit, 'overhead':overhead}
