@@ -2,12 +2,12 @@
 source env.sh
 
 EVAL_LIB=/home/sip/eval/passes/build/lib
-FILES=/home/sip/eval/coverage/*.bc
+FILES=/home/sip/eval/mibench-cov/*.bc
 coverage_dir=/home/sip/eval/coverage
 CSVPATH=/home/sip/eval/combination
 num_combination=20
-func_coverage="0 10 25 50 100"
-#func_coverage="0 100"
+#func_coverage="0 10 25 50 100"
+func_coverage="0 100"
 for f in ${FILES}
 do
 	bitcode=${f}

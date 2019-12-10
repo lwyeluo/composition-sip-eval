@@ -194,6 +194,9 @@ do
                     exit
                 fi
 
+		echo 'Obfuscating...'
+		bash obfuscate.sh -o SUB-FLA -a ${output_dir}/out.bc ${output_dir}/out.bc
+
                 # compiling external libraries to bitcodes
                 LIB_FILES=()
                 g++ -no-pie -fPIC ${OH_PATH}/assertions/response_broken.cpp -c -o "${output_dir}/oh_rtlib.o"

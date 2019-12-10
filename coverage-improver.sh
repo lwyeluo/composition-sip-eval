@@ -2,7 +2,7 @@
 source env.sh
 
 USR_LIB_DIR=/usr/local/lib
-FILES=/home/sip/eval/local_dataset/*.bc
+FILES=/home/sip/eval/simple/*.bc
 COVERAGEPATH=/home/sip/eval/coverage/
 configs=/home/sip/eval/lib-config
 for f in $FILES
