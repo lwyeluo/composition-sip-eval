@@ -248,7 +248,6 @@ do
 		                
                 echo "Done with '${outfilename}'"
 	        #clean unneccerary files
-		exit 1
 	        find ${output_dir} -type f ! -name '*.bc' -delete 
 
 #	done
