@@ -3,7 +3,7 @@ set -euo pipefail
 source env.sh
 
 EVAL_LIB=/home/sip/eval/passes/build/lib
-FILES=/home/sip/eval/mibench-cov/*.bc
+FILES=$1/*.bc
 CSVPATH=/home/sip/eval/blockfrequency
 link_libraries=/home/sip/eval/link-libraries/
 args_path=/home/sip/eval/cmdline-args

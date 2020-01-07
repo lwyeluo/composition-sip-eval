@@ -43,6 +43,10 @@ args_path=/home/sip/eval/cmdline-args
 blockfrequency=/home/sip/eval/blockfrequency
 STRATEGIES=('ilp' ) #either of 'ilp' or 'random' 
 
+
+rm -f vertices.csv rel.csv Graph.png manifests.csv manifestsrel.csv
+
+
 mkdir -p ${binary_path}
 
 for bc in ${bc_files}
@@ -138,23 +142,25 @@ do
                 cmd="${cmd} -pgo-test-profile-file=${blockfrequency}/${filename}/${filename}.prof"
                 cmd="${cmd} -profile-sample-accurate"
 		cmd="${cmd} -debug-pass=Structure"
-		if [[ $Protection == "SC"* ]]; then
+		if [[ $Protection == *"SC"* ]]; then
                   # SC flags
                   cmd="${cmd} -load /home/sip/self-checksumming/build/libSCPass.so"
                   cmd="${cmd} -use-other-functions"
-                  cmd="${cmd} -connectivity=4"
+                  cmd="${cmd} -connectivity=1"
                   #cmd="${cmd} -dump-checkers-network=${output_dir}/network_file"
                   #cmd="${cmd} -dump-sc-stat=${output_dir}/sc.stats"
                   cmd="${cmd} -filter-file=${combination_file}"
-		elif [[ $Protection == "OH"* ]]; then
+	        fi
+		if [[ $Protection == *"OH"* ]]; then
                   # OH flags
                   cmd="${cmd} -load ${OH_LIB}/liboblivious-hashing.so"
                   cmd="${cmd} -num-hash 1"
-                  cmd="${cmd} -dump-oh-stat=${output_dir}/oh.stats"
+                  #cmd="${cmd} -dump-oh-stat=${output_dir}/oh.stats"
                   cmd="${cmd} -exclude-main-unreachables"
                   cmd="${cmd} -main-reach-cached"
                   #cmd="${cmd} -protect-data-dep-loops"
-		elif [[ $Protection == "CFI"* ]]; then
+		fi
+		if [[ $Protection == *"CFI"* ]]; then
                   # CFI flags
                   cmd="${cmd} -load ${CFI_PATH}/$BUILD_DIR/libControlFlowIntegrity.so"
                   cmd="${cmd} -cfi-template ${CFI_PATH}/stack_analysis/StackAnalysis.c"
@@ -162,7 +168,7 @@ do
 		fi
                 # CF flags
                 cmd="${cmd} -cf-strategy=${STRATEGIES[0]}"
-                cmd="${cmd} -cf-dump-graphs"
+                #cmd="${cmd} -cf-dump-graphs=${output_dir}/"
                 cmd="${cmd} -cf-stats=${output_dir}/composition.stats"
 		#cmd="${cmd} -cf-ilp-prob=${output_dir}/problem.txt"
 		#cmd="${cmd} -cf-ilp-sol=${output_dir}/solution.txt"
@@ -175,11 +181,13 @@ do
                 #cmd="${cmd} -cf-ilp-blockconnectivity-bound=6"
                 cmd="${cmd} -cf-ilp-obj=manifest"
                 # PASS ORDER
-		if [[ $Protection == "SC"* ]]; then
+		if [[ $Protection == *"SC"* ]]; then
                   cmd="${cmd} -sc"
-		elif [[ $Protection == "CFI"* ]]; then
+		fi
+		if [[ $Protection == *"CFI"* ]]; then
                   cmd="${cmd} -control-flow-integrity"
-		elif [[ $Protection == "OH"* ]]; then
+		fi
+		if [[ $Protection == *"OH"* ]]; then
                   cmd="${cmd} -oh-insert"
                   cmd="${cmd} -short-range-oh"
 		fi
@@ -199,12 +207,14 @@ do
                     exit
                 fi
 		LIBS="${output_dir}/${outfilename}"
-		if [[ $Protection == "OH"* ]]; then
+		if [[ $Protection == *"OH"* ]]; then
                   LIBS="${LIBS} protection-libs/ohlib.bc" 
-                elif [[ $Protection == "CFI"* ]]; then
+	        fi
+                if [[ $Protection == *"CFI"* ]]; then
 		  echo 'Link CFIlib.bc'
                   LIBS="${LIBS} protection-libs/cfilib.bc" 
-                elif [[ $Protection == "SC"* ]]; then
+		fi
+                if [[ $Protection == *"SC"* ]]; then
                   LIBS="${LIBS} protection-libs/sclib.bc" 
                 fi
                
@@ -247,6 +257,7 @@ do
 
 		                
                 echo "Done with '${outfilename}'"
+
 	        #clean unneccerary files
 	        find ${output_dir} -type f ! -name '*.bc' -delete 
 
