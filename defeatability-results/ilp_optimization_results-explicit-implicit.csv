@@ -1,0 +1,7 @@
+,program,combinationEXPLICIT,coverageEXPLICIT,ilp_result.explicitEXPLICIT,ilp_result.implicitEXPLICIT,ilp_result.manifestEXPLICIT,ilp_result.overheadEXPLICIT,overhead_median_percentageEXPLICIT,stats_result.explicitEXPLICIT,stats_result.implicitEXPLICIT,stats_result.manifestEXPLICIT,combinationIMPLICIT,coverageIMPLICIT,ilp_result.explicitIMPLICIT,ilp_result.implicitIMPLICIT,ilp_result.manifestIMPLICIT,ilp_result.overheadIMPLICIT,overhead_median_percentageIMPLICIT,stats_result.explicitIMPLICIT,stats_result.implicitIMPLICIT,stats_result.manifestIMPLICIT
+0,say.x.bc,0,100,32912,32900,8384,0,0.0,32912,32900,8384,0,100,32909,32900,8375,0,0.0,32909,32900,8375
+1,cjpeg.x.bc,0,100,93843,93824,6453,0,0.0,93843,93824,6453,0,100,93839,93824,6450,0,0.0,93839,93824,6450
+2,djpeg.x.bc,0,100,90789,90770,6258,0,0.0,90789,90770,6258,0,100,90786,90770,6256,0,0.0,90786,90770,6256
+3,toast.x.bc,0,100,61481,61473,16921,0,0.0,61481,61473,16921,0,100,61479,61473,16918,0,0.0,61479,61473,16918
+4,susan.bc,0,100,32313,32285,6102,0,0.0,32313,32285,6102,0,100,32311,32285,6091,0,0.0,32311,32285,6091
+5,tetris.bc,0,100,3590,3567,1153,0,0.0,3590,3567,1153,0,100,3586,3567,1143,0,0.0,3586,3567,1143

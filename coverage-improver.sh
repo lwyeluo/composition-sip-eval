@@ -2,8 +2,8 @@
 source env.sh
 
 USR_LIB_DIR=/usr/local/lib
-FILES=/home/sip/eval/local_dataset/*.bc
-COVERAGEPATH=/home/sip/eval/coverage/
+FILES=$1/*.bc
+COVERAGEPATH=$2/
 configs=/home/sip/eval/lib-config
 for f in $FILES
 do
@@ -12,12 +12,12 @@ do
 	filename=${f##*/}
     	output=$COVERAGEPATH$filename
 
-    	if [ $# -eq 1 ]; then
-        	if [ -f "$output" ]; then
-        		echo "skipping $output generation, it already exists"
-        		continue
-         	fi
-    	fi
+    	#if [ $# -eq 1 ]; then
+        if [ -f "$output" ]; then
+		echo "skipping $output generation, it already exists"
+        	continue
+        fi
+    	#fi
 
 	libconfig=$configs/$filename
 	echo "$libconfig"

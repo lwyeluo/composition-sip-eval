@@ -19,7 +19,7 @@ def print_dataframes(df):
     for index,prog in df.iterrows():
          pprint.pprint(prog)
 def main():
-    df_manifest = process_files("/home/sip/eval/binaries-manifest",Objective.MANIFEST)
+    #df_manifest = process_files("/home/sip/eval/mibench-out-manifest",Objective.MANIFEST)
     #df = df.reset_index()
     #df = df.drop(columns=['index'])
     #out = df.to_json(orient='records')
@@ -27,9 +27,9 @@ def main():
     #with open('extracted-constraints.json', 'w') as f:
     #     f.write(out)
     
-    #df_explicit = process_files("/home/sip/eval/binaries-explicit",Objective.EXPLICIT)
-    #df_implicit = process_files("/home/sip/eval/binaries-implicit",Objective.IMPLICIT)
-    df_overhead = process_files("/home/sip/eval/binaries-overhead",Objective.OVERHEAD)
+    df_manifest = process_files("/home/sip/eval/mibench-out-explicit",Objective.EXPLICIT)
+    df_overhead = process_files("/home/sip/eval/mibench-out-implicit",Objective.IMPLICIT)
+    #df_overhead = process_files("/home/sip/eval/mibench-out-overhead",Objective.OVERHEAD)
     
     #df_manifest = df_manifest.fillna(0)
     #df_explicit = df_explicit.fillna(0)
