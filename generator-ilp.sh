@@ -170,7 +170,7 @@ do
                 cmd="${cmd} -cfi-outputdir ${output_dir}"
                 # CF flags
                 cmd="${cmd} -cf-strategy=${STRATEGIES[0]}"
-                cmd="${cmd} -cf-dump-graphs"
+                cmd="${cmd} -cf-dump-graphs=${output_dir}/"
                 cmd="${cmd} -cf-stats=${output_dir}/composition.stats"
 		cmd="${cmd} -cf-ilp-prob=${output_dir}/problem.txt"
 		cmd="${cmd} -cf-ilp-sol=${output_dir}/solution.txt"

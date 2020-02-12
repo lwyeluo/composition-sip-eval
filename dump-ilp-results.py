@@ -27,8 +27,8 @@ def main():
     #with open('extracted-constraints.json', 'w') as f:
     #     f.write(out)
     
-    df_manifest = process_files("/home/sip/eval/simple-out-explicit",Objective.EXPLICIT)
-    df_overhead = process_files("/home/sip/eval/simple-out-implicit",Objective.IMPLICIT)
+    df_manifest = process_files("/home/sip/eval/mibench-out-explicit",Objective.EXPLICIT)
+    df_overhead = process_files("/home/sip/eval/mibench-out-implicit",Objective.IMPLICIT)
     #df_overhead = process_files("/home/sip/eval/mibench-out-overhead",Objective.OVERHEAD)
     
     #df_manifest = df_manifest.fillna(0)

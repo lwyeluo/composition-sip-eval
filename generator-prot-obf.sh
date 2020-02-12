@@ -35,7 +35,7 @@ OH_LIB=${OH_PATH}/$BUILD_DIR
 bc_files=${Dataset}/*.bc
 #bc_files=$(ls -r ${Dataset}/*.bc)
 
-combination_path=/home/sip/eval/combination/
+combination_path=/home/sip/eval/mibench-comb/
 binary_path=${OutDir}
 config_path=/home/sip/eval/lib-config/
 link_libraries=/home/sip/eval/link-libraries/
