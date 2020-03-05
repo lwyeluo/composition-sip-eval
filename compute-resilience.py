@@ -84,9 +84,10 @@ def main(argv):
   norel_manifests=set(node_data.index.values).difference(set(g.nodes))
   #print(node_data)
   #print(norel_manifests)
-  #for m in norel_manifests:
-  #  print(m)
   missing_manifests=node_data.loc[norel_manifests]
+  print(node_data)
+  print(edges)
+  print(missing_manifests)
   dump_defeatability(g,missing_manifests,output_path)
   dump_graph(g,output_path)
 

@@ -35,7 +35,7 @@ OH_LIB=${OH_PATH}/$BUILD_DIR
 bc_files=${Dataset}/*.bc
 #bc_files=$(ls -r ${Dataset}/*.bc)
 
-combination_path=/home/sip/eval/mibench-comb/
+combination_path=/home/sip/eval/combinations/
 binary_path=${OutDir}
 config_path=/home/sip/eval/lib-config/
 link_libraries=/home/sip/eval/link-libraries/
@@ -65,7 +65,7 @@ do
 	  cp $bitcode ${binary_path}/$plainoutfile
 	  if [[ $Obfuscation != "NONE"* ]]; then
         	echo 'Obfuscating...'
-        	bash obfuscate.sh -o ${Obfuscation} -a ${binary_path}/${plainoutfile} ${binary_path}/${plainoutfile}
+        	bash obfuscate.sh -o ${Obfuscation} -a ${binary_path}/${plainoutfile} ${binary_path}/${plainoutfile} > /dev/null 2>&1
         	if [ $? -ne 0 ]; then
             	  echo Failed to Obfuscate baseline with ${Obfuscation} setting
             	  exit 1
@@ -192,13 +192,14 @@ do
                   cmd="${cmd} -short-range-oh"
 		fi
                 cmd="${cmd} -composition-framework"
-	        cmd="${cmd} -time-passes"
+	        #cmd="${cmd} -time-passes"
                 # End of command
 
                 echo "EAT ME:\n$cmd"
-                ${cmd} |& tee "${output_dir}/transform.console"
+                ${cmd} > /dev/null 2>&1 
+		#|& tee "${output_dir}/transform.console" 
 
-                echo ${output_dir}
+                #echo ${output_dir}
                 if [ $? -eq 0 ]; then
                     echo 'OK Transform'
                 else
@@ -220,7 +221,7 @@ do
                
 	        echo ${LIBS}
 		#LINK protection libs
-                llvm-link-7 ${LIBS} -o ${output_dir}/${outfilename}
+                llvm-link-7 ${LIBS} -o ${output_dir}/${outfilename} > /dev/null 2>&1 
 
                 if [ $? -eq 0 ]; then
                     echo 'OK Link'
@@ -233,13 +234,13 @@ do
                 CUSTOM_PASSES_LIB=/home/sip/offtree-o-llvm/passes/build/lib
 
 		#inline1 protection function calls
-		opt-7 -load $CUSTOM_PASSES_LIB/libCIFPass.so ${output_dir}/${outfilename} -o ${output_dir}/${outfilename} -cif
+		opt-7 -load $CUSTOM_PASSES_LIB/libCIFPass.so ${output_dir}/${outfilename} -o ${output_dir}/${outfilename} -cif > /dev/null  2>&1 
                 if [ $? -ne 0 ]; then
                   echo Failed inline step 1
                   exit 1
                 fi
                 
-		opt-7 -load $CUSTOM_PASSES_LIB/libDIFPass.so ${output_dir}/${outfilename} -o ${output_dir}/${outfilename} -dif
+		opt-7 -load $CUSTOM_PASSES_LIB/libDIFPass.so ${output_dir}/${outfilename} -o ${output_dir}/${outfilename} -dif > /dev/null  2>&1
                 if [ $? -ne 0 ]; then
                   echo Failed inline step 2
                   exit 1
@@ -248,7 +249,8 @@ do
                 #Obfuscate programs
                 if [[ $Obfuscation != "NONE"* ]]; then
 		  echo 'Obfuscating...'
-		  bash obfuscate.sh -o ${Obfuscation} -a ${output_dir}/${outfilename} ${output_dir}/${outfilename}
+		  echo obfuscate.sh -o ${Obfuscation} -a ${output_dir}/${outfilename} ${output_dir}/${outfilename}   
+		  bash obfuscate.sh -o ${Obfuscation} -a ${output_dir}/${outfilename} ${output_dir}/${outfilename}  > /dev/null 2>&1 
 		  if [ $? -ne 0 ]; then
 		    echo Failed to Obfuscate with ${Obfuscation} setting
 		    exit 1

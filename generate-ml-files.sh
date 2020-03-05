@@ -3,6 +3,8 @@ SUB='SUB'
 BCF='BCF'
 
 PERC=30
+DATASET='mibench-cov'
+GENERATIONPATH='LABELED-BCs/'
 function edit {
 	echo switched to $1
 	sed -i "s/const int defaultObfRate = 30/const int defaultObfRate = $1/g" /home/sip/offtree-o-llvm/passes/obfs/BogusControlFlow.cpp
@@ -10,38 +12,83 @@ function edit {
 	sed -i "s/const int defaultObfRate = 100/const int defaultObfRate = $1/g" /home/sip/offtree-o-llvm/passes/obfs/BogusControlFlow.cpp
 	#edit bogus control flow $1
 	#build obfuscation passes
-	make -C /home/sip/offtree-o-llvm/passes/build
+	make -C /home/sip/offtree-o-llvm/passes/build > /dev/null
 	PERC=$1
+}
+function waitforjobs {
+    while test $(jobs -p | wc -w) -ge "$1"; do wait -n; done
 }
 function generate {
 
-  for ds in 'mibench-cov';
-  #for ds in 'simple-cov';
-  do
-	for prot in 'OH' 'CFI' 'SC' ;
-#
+	for ds in $DATASET;
+		#for ds in 'simple-cov';
 	do
-		N=4
-		(
-		for combination in "$@";
+		for prot in 'OH' 'CFI' 'SC' ;
+			#
 		do
-			#generator-prot-obf.sh OH FLAs-SUB-BCF coverage mibench-OH-FLAs-SUB-BCF
-			#((i=i%N)); ((i++==0)) && wait
-			echo generator-prot-obf.sh $prot $combination $ds "labeled-samples$PERC/$ds-$combination" 
-			#bash generator-prot-obf.sh $prot $combination $ds "labeled-samples-$PERC/$ds-$combination" &
+			#N=16
+			#(
+			for combination in "$@";
+			do
+				#generator-prot-obf.sh OH FLAs-SUB-BCF coverage mibench-OH-FLAs-SUB-BCF
+			#	((i=i%N)); ((i++==0)) && wait
+				comb_dir="${combination/FLAs/FLA}"
+				comb_dir="${comb_dir/BCF/BCF$PERC}"
+				waitforjobs $(nproc)
+				echo generator-prot-obf.sh $prot $combination $ds "$GENERATIONPATH/$ds/$comb_dir"  
+				bash generator-prot-obf.sh $prot $combination $ds "$GENERATIONPATH/$ds/$comb_dir" > /dev/null & 
+			done
+			waitforjobs 1  
 		done
-		)
 	done
-  done
 
 }
-generate "NONE"
-exit 1
-edit 30
-generate "$BCF" "$FLA-$BCF" "$BCF-$FLA" "$SUB-$BCF" "$BCF-$SUB" "$FLA-$BCF-$SUB" "$FLA-$SUB-$BCF" "$BCF-$FLA-$SUB" "$BCF-$SUB-$FLA" "$SUB-$FLA-$BCF" "$SUB-$BCF-$FLA" "$SUB" "$FLA" "$SUB-$FLA" "$FLA-$SUB" 'BCF-FLAs2' 'BCF-FLAs2-SUB2' 'BCF-SUB2-FLAs2' 
-#edit bogus contrl flow to 40
-edit 40
-generate 'BCF' 'BCF-FLAs' 'BCF-FLAs-SUB' 'BCF-SUB' 'BCF-SUB-FLAs' 'FLAs-BCF' 'FLAs-BCF-SUB' 'FLAS-SUB-BCF' 'SUB-BCF' 'SUB-BCF-FLAs' 'SUB-FLAs-BCF'
-edit 100
-generate 'BCF' 'BCF-FLAs' 'BCF-FLAs-SUB' 'BCF-SUB' 'BCF-SUB-FLAs' 'FLAs-BCF' 'FLAs-BCF-SUB' 'FLAS-SUB-BCF' 'SUB-BCF' 'SUB-BCF-FLAs' 'SUB-FLAs-BCF'
+
+function verifyCountFiles {
+	VerifyPath=$1
+	BCInFolder=$2
+	for folder in ${VerifyPath};
+	do 
+		count=$(ls -1 $folder/*.bc|wc -l)
+		if [ $count != $2 ]; then
+			echo "COUNTERR"
+			echo "$folder/*.bc does not have $2 items but $count items" 
+			#exit 1
+		fi
+
+	done
+}
+
+function generateMibench {
+	DATASET='mibench-cov'
+	generate "NONE"
+	edit 30
+	generate "$BCF" "$FLA-$BCF" "$BCF-$FLA" "$SUB-$BCF" "$BCF-$SUB" "$FLA-$BCF-$SUB" "$FLA-$SUB-$BCF" "$BCF-$FLA-$SUB" "$BCF-$SUB-$FLA" "$SUB-$FLA-$BCF" "$SUB-$BCF-$FLA" "$SUB" "$FLA" "$SUB-$FLA" "$FLA-$SUB" "$BCF-$FLA"2 "$BCF-$FLA"2"-$SUB"2 "$BCF-$SUB"2"-$FLA"2 
+
+	verifyCountFiles "$GENERATIONPATH/$DATASET/*" "76"
+        	
+
+	#edit bogus contrl flow to 40
+	edit 40
+	generate "$BCF" "$BCF-$FLA" "$BCF-$FLA-$SUB" "$BCF-$SUB" "$BCF-$SUB-$FLA" "$FLA-$BCF" "$FLA-$BCF-$SUB" "$FLA-$SUB-$BCF" "$SUB-$BCF" "$SUB-$BCF-$FLA" "$SUB-$FLA-$BCF"
+	verifyCountFiles "$GENERATIONPATH/$DATASET/*" "76"
+	edit 100
+	generate "$BCF" "$BCF-$FLA" "$BCF-$FLA-$SUB" "$BCF-$SUB" "$BCF-$SUB-$FLA" "$FLA-$BCF" "$FLA-$BCF-$SUB" "$FLA-$SUB-$BCF" "$SUB-$BCF" "$SUB-$BCF-$FLA" "$SUB-$FLA-$BCF"
+	verifyCountFiles "$GENERATIONPATH/$DATASET/*" "76"
+
+}
+
+function generateSimple {
+	DATASET='simple-cov'
+	edit 30
+	generate "NONE"
+	generate "$BCF" "$FLA-$BCF" "$BCF-$FLA" "$SUB-$BCF" "$BCF-$SUB" "$FLA-$BCF-$SUB" "$FLA-$SUB-$BCF" "$BCF-$FLA-$SUB" "$BCF-$SUB-$FLA" "$SUB-$FLA-$BCF" "$SUB-$BCF-$FLA" "$SUB" "$FLA" "$SUB-$FLA" "$FLA-$SUB"
+	verifyCountFiles "$GENERATIONPATH/$DATASET/*" "160"
+}
+
+
+
+generateSimple
+generateMibench
+
 
